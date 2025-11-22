@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Documentation
+README.md
+CHANGELOG.md
+
+# Logs
+log/*
+tmp/*
+
+# Dependencies
+node_modules/
+vendor/bundle/
+
+# Storage
+storage/*
+public/uploads
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Kamal (won't interfere with Kamal builds)
+.kamal/

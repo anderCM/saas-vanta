@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+# Ensure we can find the installed gems
+export PATH="/usr/local/bundle/bin:$PATH"
+
+# If running the rails server then create or migrate existing database
+if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+
+# Execute the command
+exec "${@}"
