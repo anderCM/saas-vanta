@@ -1,0 +1,17 @@
+<h2>Hola, <%= @user.first_name %>!</h2>
+
+<p>
+  Has sido invitado a formar parte del equipo de <strong><%= @enterprise.comercial_name %></strong>.
+</p>
+
+<p>
+  Para activar tu cuenta y configurar tu contraseña de acceso, por favor haz clic en el siguiente botón:
+</p>
+
+<div style="text-align: center;">
+  <%= link_to "Aceptar Invitación", @invitation_url, class: "button", style: "color: #ffffff;" %>
+</div>
+
+<p style="margin-top: 30px; font-size: 14px; color: #666;">
+  Este enlace es válido por 7 días. Si no esperabas esta invitación, puedes ignorar este correo.
+</p>
