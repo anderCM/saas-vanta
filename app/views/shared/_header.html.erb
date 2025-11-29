@@ -1,0 +1,21 @@
+<header class="bg-primary text-white shadow-md">
+  <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="text-2xl font-bold">
+      <%= link_to "Saas Vanta", root_path, class: "hover:text-gray-200 transition-colors" %>
+    </div>
+    <div class="hidden md:flex space-x-6">
+      <%= link_to "Home", root_path, class: "hover:text-gray-200 transition-colors" %>
+      <%= link_to "Features", "#", class: "hover:text-gray-200 transition-colors" %>
+      <%= link_to "Pricing", "#", class: "hover:text-gray-200 transition-colors" %>
+      <%= link_to "Login", "#", class: "bg-white text-primary px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors" %>
+    </div>
+    <!-- Mobile Menu Button (Placeholder) -->
+    <div class="md:hidden">
+      <button class="focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>

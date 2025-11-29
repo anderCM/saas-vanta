@@ -1,0 +1,15 @@
+<footer class="bg-secondary text-white py-8 mt-auto">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-4 md:mb-0">
+        <h3 class="text-xl font-bold">Saas Vanta</h3>
+        <p class="text-sm text-gray-400 mt-1">© <%= Time.current.year %> All rights reserved.</p>
+      </div>
+      <div class="flex space-x-6">
+        <%= link_to "Privacy Policy", "#", class: "text-gray-300 hover:text-white transition-colors" %>
+        <%= link_to "Terms of Service", "#", class: "text-gray-300 hover:text-white transition-colors" %>
+        <%= link_to "Contact", "#", class: "text-gray-300 hover:text-white transition-colors" %>
+      </div>
+    </div>
+  </div>
+</footer>
