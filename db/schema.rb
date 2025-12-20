@@ -15,20 +15,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_063002) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "enterprises", force: :cascade do |t|
-    t.string "address", null: false
+    t.string "address"
     t.string "comercial_name", null: false
     t.datetime "created_at", null: false
-    t.string "email", null: false
+    t.string "email"
+    t.string "enterprise_type", null: false
     t.string "logo"
     t.string "phone_number"
-    t.string "social_reason", null: false
+    t.string "social_reason"
     t.string "status", null: false
     t.string "subdomain", null: false
-    t.bigint "tax_id", null: false
+    t.bigint "tax_id"
     t.datetime "updated_at", null: false
     t.index ["status"], name: "index_enterprises_on_status"
     t.index ["subdomain"], name: "index_enterprises_on_subdomain", unique: true
-    t.index ["tax_id"], name: "index_enterprises_on_tax_id", unique: true
+    t.index ["tax_id"], name: "idx_enterprises_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -80,7 +81,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_063002) do
     t.string "password_digest"
     t.string "phone_number"
     t.string "platform_role", null: false
-    t.string "second_last_name", null: false
+    t.string "second_last_name"
     t.string "status", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
