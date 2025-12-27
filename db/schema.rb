@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_22_063002) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_20_203437) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,6 +30,39 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_063002) do
     t.index ["status"], name: "index_enterprises_on_status"
     t.index ["subdomain"], name: "index_enterprises_on_subdomain", unique: true
     t.index ["tax_id"], name: "idx_enterprises_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.decimal "buy_price", null: false
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.bigint "enterprise_id", null: false
+    t.string "name", null: false
+    t.bigint "provider_id", null: false
+    t.decimal "sell_cash_price", null: false
+    t.decimal "sell_credit_price", null: false
+    t.string "sku"
+    t.string "status", null: false
+    t.integer "stock"
+    t.string "unit", null: false
+    t.integer "units_per_package"
+    t.datetime "updated_at", null: false
+    t.index ["enterprise_id", "sku"], name: "idx_products_on_sku_unq_not_null", unique: true, where: "(sku IS NOT NULL)"
+    t.index ["enterprise_id"], name: "index_products_on_enterprise_id"
+    t.index ["provider_id"], name: "index_products_on_provider_id"
+    t.index ["status"], name: "index_products_on_status"
+  end
+
+  create_table "providers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.bigint "enterprise_id", null: false
+    t.string "name", null: false
+    t.string "phone_number"
+    t.string "tax_id"
+    t.datetime "updated_at", null: false
+    t.index ["enterprise_id", "tax_id"], name: "idx_providers_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
+    t.index ["enterprise_id"], name: "index_providers_on_enterprise_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -90,6 +123,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_063002) do
     t.index ["status"], name: "index_users_on_status"
   end
 
+  add_foreign_key "products", "enterprises"
+  add_foreign_key "products", "providers"
+  add_foreign_key "providers", "enterprises"
   add_foreign_key "sessions", "users"
   add_foreign_key "user_enterprise_roles", "roles"
   add_foreign_key "user_enterprise_roles", "user_enterprises"
