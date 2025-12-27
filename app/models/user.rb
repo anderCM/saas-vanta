@@ -8,7 +8,7 @@ class User < ApplicationRecord
   has_many :enterprises, through: :user_enterprises
 
   # Validations
-  validates :first_name, :first_last_name, :second_last_name, :email_address, presence: true
+  validates :first_name, :first_last_name, :email_address, presence: true
   validates :email_address, uniqueness: true
 
   # Require password only for active users (not for pending invitations)

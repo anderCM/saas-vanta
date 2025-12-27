@@ -17,7 +17,6 @@ class Enterprise < ApplicationRecord
 
   # Enums
   enum :status, {
-      activating: "activating",
       active: "active",
       inactive: "inactive"
   }
