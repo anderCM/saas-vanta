@@ -4,13 +4,15 @@ RSpec.describe Users::InviteUserToEnterprise do
   before { ActiveJob::Base.queue_adapter = :test }
 
   let(:enterprise) { create(:enterprise) }
+  let!(:admin_role) { Role.find_or_create_by!(slug: 'admin') { |r| r.name = 'Admin' } }
   let(:valid_params) do
     {
       enterprise: enterprise,
       user_email: 'newuser@example.com',
       first_name: 'John',
       first_last_name: 'Doe',
-      second_last_name: 'Smith'
+      second_last_name: 'Smith',
+      role_slug: 'admin'
     }
   end
 
@@ -20,6 +22,11 @@ RSpec.describe Users::InviteUserToEnterprise do
     context 'when inputs are valid' do
       it 'returns true' do
         expect(service.call).to be true
+      end
+
+      it 'marks the service as valid' do
+        service.call
+        expect(service.valid?).to be true
       end
 
       it 'creates a new user with pending status' do
@@ -35,6 +42,12 @@ RSpec.describe Users::InviteUserToEnterprise do
         user = User.last
         expect(UserEnterprise.last.user).to eq(user)
         expect(UserEnterprise.last.enterprise).to eq(enterprise)
+      end
+
+      it 'assigns the role to the user enterprise' do
+        expect { service.call }.to change(UserEnterpriseRole, :count).by(1)
+        user_enterprise = UserEnterprise.last
+        expect(user_enterprise.roles).to include(admin_role)
       end
 
       it 'calls SendUserEnterpriseInvitation service' do
@@ -59,6 +72,12 @@ RSpec.describe Users::InviteUserToEnterprise do
         expect { service.call }.to change(UserEnterprise, :count).by(1)
         expect(UserEnterprise.last.user).to eq(existing_user)
       end
+
+      it 'assigns the role to the existing user enterprise' do
+        expect { service.call }.to change(UserEnterpriseRole, :count).by(1)
+        user_enterprise = UserEnterprise.last
+        expect(user_enterprise.roles).to include(admin_role)
+      end
     end
 
     context 'when user is already in the enterprise' do
@@ -72,6 +91,11 @@ RSpec.describe Users::InviteUserToEnterprise do
         expect(service.call).to be false
       end
 
+      it 'marks the service as invalid' do
+        service.call
+        expect(service.valid?).to be false
+      end
+
       it 'adds an error message' do
         service.call
         expect(service.errors).to include("Error al invitar usuario: User already exists in this enterprise")
@@ -80,12 +104,17 @@ RSpec.describe Users::InviteUserToEnterprise do
 
     context 'when SendUserEnterpriseInvitation fails' do
       before do
-        invitation_service = instance_double(Users::SendUserEnterpriseInvitation, call: false, errors: [ "Some error" ], valid?: false)
+        invitation_service = instance_double(Users::SendUserEnterpriseInvitation, call: false, errors: [ "Some error" ], errors_message: "Some error", valid?: false)
         allow(Users::SendUserEnterpriseInvitation).to receive(:new).and_return(invitation_service)
       end
 
       it 'returns false' do
         expect(service.call).to be false
+      end
+
+      it 'marks the service as invalid' do
+        service.call
+        expect(service.valid?).to be false
       end
 
       it 'adds errors from the invitation service' do
@@ -100,6 +129,7 @@ RSpec.describe Users::InviteUserToEnterprise do
         service = described_class.new(**invalid_params)
 
         expect(service.call).to be false
+        expect(service.valid?).to be false
         expect(service.errors).to include("Enterprise es requerido")
       end
 
@@ -108,7 +138,28 @@ RSpec.describe Users::InviteUserToEnterprise do
         service = described_class.new(**invalid_params)
 
         expect(service.call).to be false
+        expect(service.valid?).to be false
         expect(service.errors).to include("User_email es requerido")
+      end
+
+      it 'returns false when role_slug is missing' do
+        invalid_params = valid_params.merge(role_slug: nil)
+        service = described_class.new(**invalid_params)
+
+        expect(service.call).to be false
+        expect(service.valid?).to be false
+        expect(service.errors).to include("Role_slug es requerido")
+      end
+    end
+
+    context 'when role_slug is invalid' do
+      it 'returns false with an invalid role' do
+        invalid_params = valid_params.merge(role_slug: 'invalid_role')
+        service = described_class.new(**invalid_params)
+
+        expect(service.call).to be false
+        expect(service.valid?).to be false
+        expect(service.errors.first).to include("El rol 'invalid_role' no es válido")
       end
     end
   end

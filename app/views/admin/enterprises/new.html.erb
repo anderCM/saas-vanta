@@ -1,0 +1,217 @@
+<div class="max-w-4xl mx-auto py-8 px-4">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Registrar Nueva Empresa</h1>
+    <p class="mt-1 text-sm text-gray-500">Complete los datos de la empresa y de los usuarios.</p>
+  </div>
+
+  <%= form_with model: [:admin, @enterprise], class: "space-y-8", local: true, data: { controller: "enterprise-form" } do |f| %>
+    <% if @enterprise.errors.any? %>
+      <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Se encontraron errores:</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <ul role="list" class="list-disc space-y-1 pl-5">
+                <% @enterprise.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Datos de la Empresa</h3>
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          
+          <div class="sm:col-span-3">
+            <%= f.label :enterprise_type, "Tipo de Empresa", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.select :enterprise_type, Enterprise.enterprise_types.keys.map { |k| [k.humanize, k] }, {}, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", data: { enterprise_form_target: "typeSelect", action: "change->enterprise-form#toggle" } %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3 hidden" data-enterprise-form-target="taxIdContainer">
+            <%= f.label :tax_id, "RUC / Tax ID", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.text_field :tax_id, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", data: { enterprise_form_target: "taxIdInput" } %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-6" id="social_reason_container">
+            <%= f.label :social_reason, "Razón Social", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.text_field :social_reason, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= f.label :comercial_name, "Nombre Comercial", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.text_field :comercial_name, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= f.label :address, "Dirección", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.text_field :address, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <%= f.label :email, "Email de la Empresa", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.email_field :email, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <%= f.label :phone_number, "Teléfono", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <%= f.text_field :phone_number, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            </div>
+          </div>
+          
+          <div class="sm:col-span-6">
+            <%= f.label :logo, "Logo", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1 flex items-center">
+              <%= f.file_field :logo, class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <%# First User - Super Admin (Required) %>
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Usuario Super Admin</h3>
+            <p class="mt-1 text-sm text-gray-500">Este usuario será el administrador principal de la empresa (requerido).</p>
+          </div>
+          <span class="inline-flex items-center rounded-full bg-indigo-100 px-3 py-0.5 text-sm font-medium text-indigo-800">Super Admin</span>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <input type="hidden" name="enterprise[users][][role_slug]" value="super_admin">
+          
+          <div class="sm:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <div class="mt-1">
+              <input type="text" name="enterprise[users][][first_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Apellido Paterno</label>
+            <div class="mt-1">
+              <input type="text" name="enterprise[users][][first_last_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Apellido Materno</label>
+            <div class="mt-1">
+              <input type="text" name="enterprise[users][][second_last_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Email del Usuario</label>
+            <div class="mt-1">
+              <input type="email" name="enterprise[users][][user_email]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Additional Users Container %>
+    <div data-enterprise-form-target="usersContainer" class="space-y-6">
+      <%# Dynamic users will be added here %>
+    </div>
+
+    <%# Add User Button %>
+    <div class="flex justify-center">
+      <button type="button" 
+              data-action="click->enterprise-form#addUser"
+              class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+        </svg>
+        Agregar Usuario
+      </button>
+    </div>
+
+    <%# Template for new users %>
+    <template data-enterprise-form-target="userTemplate">
+      <div data-user-card class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium leading-6 text-gray-900"><span data-user-number>Usuario #2</span></h3>
+            <button type="button" 
+                    data-action="click->enterprise-form#removeUser"
+                    class="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+              <svg class="-ml-0.5 mr-1.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              Eliminar
+            </button>
+          </div>
+          
+          <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
+              <label class="block text-sm font-medium text-gray-700">Nombre</label>
+              <div class="mt-1">
+                <input type="text" name="enterprise[users][][first_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block text-sm font-medium text-gray-700">Apellido Paterno</label>
+              <div class="mt-1">
+                <input type="text" name="enterprise[users][][first_last_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block text-sm font-medium text-gray-700">Apellido Materno</label>
+              <div class="mt-1">
+                <input type="text" name="enterprise[users][][second_last_name]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block text-sm font-medium text-gray-700">Email del Usuario</label>
+              <div class="mt-1">
+                <input type="email" name="enterprise[users][][user_email]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              </div>
+            </div>
+
+            <div class="sm:col-span-6">
+              <label class="block text-sm font-medium text-gray-700">Rol</label>
+              <div class="mt-1">
+                <select name="enterprise[users][][role_slug]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                  <option value="super_admin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="seller">Vendedor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div class="flex justify-end">
+      <%= link_to "Cancelar", root_path, class: "rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <%= f.submit "Registrar Empresa", class: "ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  <% end %>
+</div>

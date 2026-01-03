@@ -9,6 +9,8 @@ class Role < ApplicationRecord
 
   # Enums
   enum :slug, {
-    admin: "admin"
+    super_admin: "super_admin",
+    admin: "admin",
+    seller: "seller"
   }
 end
