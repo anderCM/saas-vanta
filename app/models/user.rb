@@ -6,6 +6,8 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :user_enterprises
   has_many :enterprises, through: :user_enterprises
+  has_many :user_enterprise_roles, through: :user_enterprises
+  has_many :roles, through: :user_enterprise_roles
 
   # Validations
   validates :first_name, :first_last_name, :email_address, presence: true

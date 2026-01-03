@@ -21,8 +21,8 @@ RSpec.describe Product, type: :model do
       end
 
       it 'allows nil stock' do
-         product = build(:product, stock: nil)
-         expect(product).to be_valid
+        product = build(:product, stock: nil)
+        expect(product).to be_valid
       end
     end
 

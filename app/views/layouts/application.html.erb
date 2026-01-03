@@ -24,7 +24,41 @@
   </head>
 
   <body>
+    <nav class="bg-gray-800">
+      <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+          <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+            <div class="flex flex-shrink-0 items-center">
+              <span class="text-white font-bold text-xl">Saas Vanta</span>
+            </div>
+            <div class="hidden sm:ml-6 sm:block">
+              <div class="flex space-x-4">
+                <%= link_to "Dashboard", root_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
+                <% if Current.user&.super_admin? %>
+                  <%= link_to "Registrar Empresa", new_admin_enterprise_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+             <% if authenticated? %>
+                <span class="text-gray-300 mr-4">Hola, <%= Current.user.email_address %></span>
+                <%= button_to "Cerrar Sesión", session_path, method: :delete, class: "text-gray-300 hover:bg-red-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
+             <% else %>
+                <%= link_to "Iniciar Sesión", new_session_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
+             <% end %>
+          </div>
+        </div>
+      </div>
+    </nav>
     <main class="container mx-auto mt-28 px-5 flex">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+        <% flash.each do |key, value| %>
+          <div class="<%= key == 'notice' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700' %> border px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline"><%= value %></span>
+          </div>
+        <% end %>
+      </div>
       <%= yield %>
     </main>
   </body>
