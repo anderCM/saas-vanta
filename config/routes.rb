@@ -6,6 +6,13 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :enterprises, only: [ :new, :create ]
+    resource :dashboard, only: [ :show ]
+  end
+
+  resources :enterprises, only: [ :index ] do
+    member do
+      post :select
+    end
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

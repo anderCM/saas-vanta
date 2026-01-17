@@ -5,4 +5,12 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  helper_method :current_enterprise
+
+  private
+
+  def current_enterprise
+    @current_enterprise ||= Current.user&.enterprises&.find_by(id: session[:enterprise_id])
+  end
 end
