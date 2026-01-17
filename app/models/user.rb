@@ -38,6 +38,7 @@ class User < ApplicationRecord
     self.invitation_token = SecureRandom.urlsafe_base64(32)
     self.invitation_sent_at = Time.current
     self.status = :pending
+    self.invitation_accepted_at = nil
     save!
   end
 
