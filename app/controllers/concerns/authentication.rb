@@ -3,12 +3,17 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
+    before_action :require_enterprise_selection
+    helper_method :authenticated?, :current_enterprise
   end
 
   class_methods do
     def allow_unauthenticated_access(**options)
       skip_before_action :require_authentication, **options
+    end
+
+    def skip_enterprise_selection(**options)
+      skip_before_action :require_enterprise_selection, **options
     end
   end
 
@@ -17,8 +22,26 @@ module Authentication
     resume_session
   end
 
+  def redirect_if_authenticated
+    redirect_to root_path if authenticated?
+  end
+
   def require_authentication
     resume_session || request_authentication
+  end
+
+  def require_enterprise_selection
+    return unless Current.user
+    return if Current.user.super_admin?
+    return if session[:enterprise_id].present?
+    return if Current.user.enterprises.count <= 1
+
+    redirect_to enterprises_path
+  end
+
+  def current_enterprise
+    return nil unless session[:enterprise_id]
+    @current_enterprise ||= Current.user&.enterprises&.find_by(id: session[:enterprise_id])
   end
 
   def resume_session
@@ -31,7 +54,7 @@ module Authentication
 
   def request_authentication
     session[:return_to_after_authenticating] = request.url
-    redirect_to new_session_path
+    redirect_to login_path
   end
 
   def after_authentication_url

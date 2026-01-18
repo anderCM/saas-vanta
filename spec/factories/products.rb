@@ -8,6 +8,7 @@ FactoryBot.define do
     sell_credit_price { Faker::Commerce.price(range: 101.0..150.0) }
     unit { Product.units.keys.sample }
     status { Product.statuses.keys.sample }
+    source_type { "purchased" }
     stock { Faker::Number.between(from: 1, to: 100) }
     units_per_package { Faker::Number.between(from: 1, to: 50) }
   end

@@ -1,5 +1,7 @@
 class InvitationsController < ApplicationController
   allow_unauthenticated_access only: [ :edit, :update ]
+  layout "auth"
+
   before_action :set_user_by_token
 
   def edit
@@ -21,7 +23,7 @@ class InvitationsController < ApplicationController
     @user = User.find_by(invitation_token: params[:token])
 
     unless @user && @user.invitation_valid?
-      redirect_to new_session_path, alert: "El enlace de invitación es inválido o ha expirado."
+      redirect_to login_path, alert: "El enlace de invitación es inválido o ha expirado."
     end
   end
 

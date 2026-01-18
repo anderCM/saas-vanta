@@ -1,7 +1,7 @@
 class Product < ApplicationRecord
   # Asociations
   belongs_to :enterprise
-  belongs_to :provider
+  belongs_to :provider, optional: true
 
   # Validations
   validates :name, presence: true
@@ -10,6 +10,7 @@ class Product < ApplicationRecord
   validates :sell_credit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validate :validate_stock
   validate :validate_units_per_package
+  validate :provider_presence_based_on_source
 
   # Enums
   enum :unit, {
@@ -25,6 +26,12 @@ class Product < ApplicationRecord
     active: "active",
     inactive: "inactive",
     discontinued: "discontinued"
+  }
+
+  enum :source_type, {
+    purchased: "purchased",
+    manufactured: "manufactured",
+    other: "other"
   }
 
   private
@@ -57,5 +64,11 @@ class Product < ApplicationRecord
     unless units_per_package.positive?
       errors.add(:base, errors_msg)
     end
+  end
+
+  def provider_presence_based_on_source
+    return unless source_type == "purchased"
+
+    errors.add(:base, "Proveedor es obligatorio para productos comprados") if provider.nil?
   end
 end

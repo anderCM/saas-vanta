@@ -1,4 +1,7 @@
 class EnterprisesController < ApplicationController
+  layout "auth", only: [ :index ]
+  skip_enterprise_selection only: [ :index, :select ]
+
   def index
     @enterprises = Current.user.enterprises
   end
