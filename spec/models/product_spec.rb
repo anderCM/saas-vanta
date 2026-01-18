@@ -49,6 +49,24 @@ RSpec.describe Product, type: :model do
         expect(product).to be_valid
       end
     end
+
+    context 'provider_presence_based_on_source' do
+      it 'validates that provider is present if source_type is purchased' do
+        product = build(:product, source_type: 'purchased', provider: nil)
+        expect(product).not_to be_valid
+        expect(product.errors[:base]).to include("Proveedor es obligatorio para productos comprados")
+      end
+
+      it 'allows valid product with provider if source_type is purchased' do
+        product = build(:product, source_type: 'purchased', provider: build(:provider))
+        expect(product).to be_valid
+      end
+
+      it 'allows nil provider if source_type is not purchased' do
+        product = build(:product, source_type: 'manufactured', provider: nil)
+        expect(product).to be_valid
+      end
+    end
   end
 
   describe 'enums' do

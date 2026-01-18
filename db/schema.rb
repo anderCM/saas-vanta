@@ -38,10 +38,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_20_203437) do
     t.string "description"
     t.bigint "enterprise_id", null: false
     t.string "name", null: false
-    t.bigint "provider_id", null: false
+    t.bigint "provider_id"
     t.decimal "sell_cash_price", null: false
     t.decimal "sell_credit_price", null: false
     t.string "sku"
+    t.string "source_type", null: false
     t.string "status", null: false
     t.integer "stock"
     t.string "unit", null: false
