@@ -45,11 +45,14 @@ gem "image_processing", "~> 1.2"
 # Use awesome_print for better debugging
 gem "awesome_print", "~> 1.9", ">= 1.9.2"
 
+# Pagination
+gem "pagy", "~> 9.3"
+
 # Use data_migrate for database migrations
 gem "data_migrate", "~> 11.3", ">= 11.3.1"
 
 # For multimedia storage
-gem 'cloudinary', '~> 2.4', '>= 2.4.3'
+gem "cloudinary", "~> 2.4", ">= 2.4.3"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

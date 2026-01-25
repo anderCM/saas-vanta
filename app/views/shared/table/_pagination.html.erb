@@ -1,0 +1,83 @@
+<% pagy = local_assigns[:pagy] %>
+<% return if pagy.nil? || pagy.pages <= 1 %>
+
+<nav class="flex items-center justify-between" aria-label="Pagination">
+  <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+    <div>
+      <p class="text-sm text-muted-foreground">
+        Mostrando
+        <span class="font-medium"><%= pagy.from %></span>
+        a
+        <span class="font-medium"><%= pagy.to %></span>
+        de
+        <span class="font-medium"><%= pagy.count %></span>
+        resultados
+      </p>
+    </div>
+
+    <div>
+      <div class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+        <% if pagy.prev %>
+          <%= link_to pagy_url_for(pagy, pagy.prev),
+              class: "pagination-btn rounded-l-md",
+              "aria-label": "Anterior" do %>
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+            </svg>
+          <% end %>
+        <% else %>
+          <span class="pagination-btn-disabled rounded-l-md">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+            </svg>
+          </span>
+        <% end %>
+
+        <% pagy.series.each do |item| %>
+          <% case item %>
+          <% when Integer %>
+            <% if item == pagy.page %>
+              <span class="pagination-btn-active"><%= item %></span>
+            <% else %>
+              <%= link_to item, pagy_url_for(pagy, item), class: "pagination-btn" %>
+            <% end %>
+          <% when :gap %>
+            <span class="pagination-btn">...</span>
+          <% end %>
+        <% end %>
+
+        <% if pagy.next %>
+          <%= link_to pagy_url_for(pagy, pagy.next),
+              class: "pagination-btn rounded-r-md",
+              "aria-label": "Siguiente" do %>
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+            </svg>
+          <% end %>
+        <% else %>
+          <span class="pagination-btn-disabled rounded-r-md">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+            </svg>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-1 justify-between sm:hidden">
+    <% if pagy.prev %>
+      <%= link_to "Anterior", pagy_url_for(pagy, pagy.prev), class: "btn-secondary text-sm" %>
+    <% else %>
+      <span class="btn-secondary text-sm opacity-50 cursor-not-allowed">Anterior</span>
+    <% end %>
+    <span class="text-sm text-muted-foreground self-center">
+      <%= pagy.page %> / <%= pagy.pages %>
+    </span>
+    <% if pagy.next %>
+      <%= link_to "Siguiente", pagy_url_for(pagy, pagy.next), class: "btn-secondary text-sm" %>
+    <% else %>
+      <span class="btn-secondary text-sm opacity-50 cursor-not-allowed">Siguiente</span>
+    <% end %>
+  </div>
+</nav>

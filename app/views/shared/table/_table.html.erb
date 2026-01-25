@@ -1,0 +1,57 @@
+<%
+  columns = local_assigns[:columns] || []
+  records = local_assigns[:records] || []
+  pagy = local_assigns[:pagy]
+  show_actions = local_assigns.fetch(:show_actions, true)
+
+  table_helper = TableHelper::Builder.new(self, records, columns, show_actions)
+%>
+
+<div class="card overflow-hidden p-0">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-border">
+      <thead class="bg-muted/50">
+        <tr>
+          <% columns.each do |col| %>
+            <%
+              align = col[:align] || :left
+              align_class = case align
+                when :center then "text-center"
+                when :right then "text-right"
+                else "text-left"
+              end
+            %>
+            <th scope="col" class="px-6 py-3 <%= align_class %> text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <%= col[:label] %>
+            </th>
+          <% end %>
+          <% if show_actions %>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Acciones</span>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody class="bg-card divide-y divide-border">
+        <% records.each do |record| %>
+          <tr class="hover:bg-muted/30 transition-colors">
+            <%= yield(table_helper, record) %>
+            <% if show_actions %>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end gap-2">
+                  <%= table_helper.render_actions(record) %>
+                </div>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if pagy && pagy.pages > 1 %>
+    <div class="px-6 py-4 border-t border-border bg-muted/30">
+      <%= render "shared/table/pagination", pagy: pagy %>
+    </div>
+  <% end %>
+</div>
