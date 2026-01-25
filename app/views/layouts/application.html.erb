@@ -34,65 +34,54 @@
       })();
     </script>
 
-    <%# Navigation %>
-    <nav class="bg-secondary border-b border-border">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="relative flex h-16 items-center justify-between">
-          <%# Logo %>
-          <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div class="flex flex-shrink-0 items-center">
-              <img src="/logo-vanta.png" alt="VANTA" class="h-8 w-auto">
+    <% if authenticated? %>
+      <%# Authenticated Layout with Sidebar %>
+      <div data-controller="main-content" data-action="sidebar:collapsed->main-content#collapse sidebar:expanded->main-content#expand sidebar:mobileOpen->main-content#showOverlay sidebar:mobileClosed->main-content#hideOverlay">
+        <%# Mobile Overlay %>
+        <div class="sidebar-overlay" data-main-content-target="overlay" data-action="click->main-content#closeSidebar"></div>
+
+        <%= render "shared/sidebar" %>
+
+        <main class="main-with-sidebar" data-main-content-target="content">
+          <%# Dashboard Header %>
+          <header class="dashboard-header">
+            <div class="flex items-center gap-3">
+              <%# Mobile Menu Button %>
+              <button type="button" class="mobile-menu-btn" data-action="click->main-content#openSidebar" title="Abrir menú">
+                <%= sidebar_icon("menu", class: "w-6 h-6") %>
+              </button>
+              <h1 class="dashboard-header-title"><%= content_for(:page_title) || "Dashboard" %></h1>
             </div>
-            <div class="hidden sm:ml-6 sm:block">
-              <div class="flex space-x-4">
-                <%= link_to "Dashboard", root_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
-                <% if Current.user&.super_admin? %>
-                  <%= link_to "Registrar Empresa", new_admin_enterprise_path, class: "text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium" %>
-                <% end %>
+          </header>
+
+          <%# Main Content %>
+          <div class="dashboard-content">
+            <%# Flash Messages %>
+            <% flash.each do |key, value| %>
+              <div class="<%= key == 'notice' ? 'alert-success' : 'alert-error' %> mb-6" role="alert">
+                <span class="block sm:inline"><%= value %></span>
               </div>
-            </div>
-          </div>
-
-          <%# Right side %>
-          <div class="flex items-center gap-4">
-            <%# Theme Toggle %>
-            <button
-              id="theme-toggle"
-              class="p-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
-              aria-label="Cambiar tema"
-            >
-              <svg id="sun-icon" class="hidden w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <svg id="moon-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            </button>
-
-            <% if authenticated? %>
-              <span class="text-gray-300 text-sm hidden sm:block">Hola, <%= Current.user.first_name %></span>
-              <%= button_to "Cerrar Sesión", session_path, method: :delete, class: "text-gray-300 hover:bg-red-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium transition-colors" %>
-            <% else %>
-              <%= link_to "Iniciar Sesión", login_path, class: "btn-primary text-sm" %>
             <% end %>
+
+            <%= yield %>
           </div>
+        </main>
+      </div>
+    <% else %>
+      <%# Public Layout (Login, etc.) %>
+      <main class="min-h-screen bg-background">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <%# Flash Messages %>
+          <% flash.each do |key, value| %>
+            <div class="<%= key == 'notice' ? 'alert-success' : 'alert-error' %> mb-6" role="alert">
+              <span class="block sm:inline"><%= value %></span>
+            </div>
+          <% end %>
+
+          <%= yield %>
         </div>
-      </div>
-    </nav>
-
-    <%# Main Content %>
-    <main class="min-h-screen bg-background">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <%# Flash Messages %>
-        <% flash.each do |key, value| %>
-          <div class="<%= key == 'notice' ? 'alert-success' : 'alert-error' %> mb-6" role="alert">
-            <span class="block sm:inline"><%= value %></span>
-          </div>
-        <% end %>
-
-        <%= yield %>
-      </div>
-    </main>
+      </main>
+    <% end %>
 
     <%# Theme toggle functionality %>
     <script>
@@ -103,7 +92,7 @@
         } else {
           document.body.classList.remove('dark');
         }
-        updateThemeIcons();
+        updateThemeUI();
       }
 
       function toggleTheme() {
@@ -115,21 +104,27 @@
           document.body.classList.add('dark');
           localStorage.setItem('theme', 'dark');
         }
-        updateThemeIcons();
+        updateThemeUI();
       }
 
-      function updateThemeIcons() {
+      function updateThemeUI() {
         const isDark = document.body.classList.contains('dark');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
 
-        if (isDark) {
-          sunIcon?.classList.remove('hidden');
-          moonIcon?.classList.add('hidden');
-        } else {
-          sunIcon?.classList.add('hidden');
-          moonIcon?.classList.remove('hidden');
-        }
+        // Toggle icons
+        document.querySelectorAll('.theme-icon-dark').forEach(el => {
+          el.classList.toggle('hidden', isDark);
+        });
+        document.querySelectorAll('.theme-icon-light').forEach(el => {
+          el.classList.toggle('hidden', !isDark);
+        });
+
+        // Toggle text
+        document.querySelectorAll('.theme-text-dark').forEach(el => {
+          el.classList.toggle('hidden', isDark);
+        });
+        document.querySelectorAll('.theme-text-light').forEach(el => {
+          el.classList.toggle('hidden', !isDark);
+        });
       }
 
       document.addEventListener('DOMContentLoaded', () => {
@@ -137,7 +132,30 @@
         document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
       });
 
+      // Also run on turbo:load for Turbo Drive navigation
+      document.addEventListener('turbo:load', () => {
+        initTheme();
+        document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+      });
+
       initTheme();
+    </script>
+
+    <%# Sidebar state initialization %>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Only apply collapsed state on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+          const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+          const mainContent = document.querySelector('.main-with-sidebar');
+          const sidebar = document.querySelector('.sidebar');
+          if (isCollapsed) {
+            if (mainContent) mainContent.classList.add('sidebar-is-collapsed');
+            if (sidebar) sidebar.classList.add('sidebar-collapsed');
+          }
+        }
+      });
     </script>
   </body>
 </html>

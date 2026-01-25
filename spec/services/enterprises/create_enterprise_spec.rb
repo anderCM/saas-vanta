@@ -17,7 +17,7 @@ RSpec.describe Enterprises::CreateEnterprise do
 
   describe '#call' do
     context 'when user is a super_admin and active' do
-      let(:service) { described_class.new(user_id: super_admin_user.id, **valid_params) }
+      let(:service) { described_class.new(user_id: super_admin_user.id, params: valid_params) }
 
       it 'creates a new enterprise successfully' do
         expect { service.call }.to change(Enterprise, :count).by(1)
@@ -46,7 +46,7 @@ RSpec.describe Enterprises::CreateEnterprise do
 
       context 'when tax_id is provided' do
         let(:params_with_tax_id) { valid_params.merge(tax_id: 20123456789) }
-        let(:service_with_tax_id) { described_class.new(user_id: super_admin_user.id, **params_with_tax_id) }
+        let(:service_with_tax_id) { described_class.new(user_id: super_admin_user.id, params: params_with_tax_id) }
 
         it 'sets enterprise_type to formal' do
           service_with_tax_id.call
@@ -56,7 +56,7 @@ RSpec.describe Enterprises::CreateEnterprise do
     end
 
     context 'when user is not a super_admin' do
-      let(:service) { described_class.new(user_id: standard_user.id, **valid_params) }
+      let(:service) { described_class.new(user_id: standard_user.id, params: valid_params) }
 
       it 'does not create an enterprise' do
         expect { service.call }.not_to change(Enterprise, :count)
@@ -74,7 +74,7 @@ RSpec.describe Enterprises::CreateEnterprise do
     end
 
     context 'when user is inactive' do
-      let(:service) { described_class.new(user_id: inactive_user.id, **valid_params) }
+      let(:service) { described_class.new(user_id: inactive_user.id, params: valid_params) }
 
       it 'does not create an enterprise' do
         expect { service.call }.not_to change(Enterprise, :count)
@@ -92,7 +92,7 @@ RSpec.describe Enterprises::CreateEnterprise do
     end
 
     context 'when user does not exist' do
-      let(:service) { described_class.new(user_id: -1, **valid_params) }
+      let(:service) { described_class.new(user_id: -1, params: valid_params) }
 
       it 'does not create an enterprise' do
         expect { service.call }.not_to change(Enterprise, :count)
@@ -111,7 +111,7 @@ RSpec.describe Enterprises::CreateEnterprise do
 
     context 'when enterprise validation fails' do
       let(:invalid_enterprise_params) { { comercial_name: nil } }
-      let(:service) { described_class.new(user_id: super_admin_user.id, **invalid_enterprise_params) }
+      let(:service) { described_class.new(user_id: super_admin_user.id, params: invalid_enterprise_params) }
 
       it 'does not create an enterprise' do
         expect { service.call }.not_to change(Enterprise, :count)
@@ -133,7 +133,7 @@ RSpec.describe Enterprises::CreateEnterprise do
         create(:enterprise, comercial_name: 'Mi Empresa Test')
       end
 
-      let(:service) { described_class.new(user_id: super_admin_user.id, **valid_params) }
+      let(:service) { described_class.new(user_id: super_admin_user.id, params: valid_params) }
 
       it 'does not create a duplicate enterprise' do
         expect { service.call }.not_to change(Enterprise, :count)
@@ -147,7 +147,7 @@ RSpec.describe Enterprises::CreateEnterprise do
   end
 
   describe '#enterprise' do
-    let(:service) { described_class.new(user_id: super_admin_user.id, **valid_params) }
+    let(:service) { described_class.new(user_id: super_admin_user.id, params: valid_params) }
 
     context 'before calling the service' do
       it 'returns nil' do

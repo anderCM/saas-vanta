@@ -1,17 +1,6 @@
 # Authorization concern for controllers
 #
 # Provides methods to authorize actions based on policies.
-#
-# @example Including in a controller
-#   class ProductsController < ApplicationController
-#     include Authorization
-#
-#     def edit
-#       @product = Product.find(params[:id])
-#       authorize @product
-#     end
-#   end
-#
 module Authorization
   extend ActiveSupport::Concern
 
@@ -38,14 +27,8 @@ module Authorization
   # @param record [Object] the record to authorize
   # @param action [Symbol, nil] the action to authorize (defaults to "#{action_name}?")
   # @raise [NotAuthorizedError] if the user is not authorized
+  #
   # @return [Boolean] true if authorized
-  #
-  # @example Authorize with default action
-  #   authorize @product  # Uses "edit?" for edit action
-  #
-  # @example Authorize with specific action
-  #   authorize @product, :update?
-  #
   def authorize(record, action = nil)
     action ||= "#{action_name}?"
     policy_instance = policy(record)
@@ -94,13 +77,13 @@ module Authorization
   #
   def find_policy_class(record)
     klass = case record
-            when Class
-              record
-            when Array
-              record.last.class
-            else
-              record.class
-            end
+    when Class
+      record
+    when Array
+      record.last.class
+    else
+      record.class
+    end
 
     "#{klass}Policy".constantize
   rescue NameError
