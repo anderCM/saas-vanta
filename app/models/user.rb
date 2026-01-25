@@ -85,6 +85,31 @@ class User < ApplicationRecord
     pending? && invitation_token.present? && !invitation_accepted?
   end
 
+  # Get the user's role slugs for a specific enterprise
+  #
+  # @param enterprise [Enterprise] the enterprise to get roles for
+  #
+  # @return [Array<String>] array of role slugs
+  def roles_for(enterprise)
+    return [] unless enterprise
+
+    user_enterprises
+      .includes(:roles)
+      .find_by(enterprise: enterprise)
+      &.roles
+      &.pluck(:slug) || []
+  end
+
+  # Check if user has a specific role in an enterprise
+  #
+  # @param enterprise [Enterprise] the enterprise to check
+  # @param role_slug [String, Symbol] the role slug to check
+  #
+  # @return [Boolean]
+  def has_role?(enterprise, role_slug)
+    roles_for(enterprise).include?(role_slug.to_s)
+  end
+
   private
 
   # Validates if password is required when

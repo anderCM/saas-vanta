@@ -1,5 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include Authorization
+
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -8,9 +10,17 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_enterprise
 
+  # Handle authorization errors
+  rescue_from Authorization::NotAuthorizedError, with: :user_not_authorized
+
   private
 
   def current_enterprise
     @current_enterprise ||= Current.user&.enterprises&.find_by(id: session[:enterprise_id])
+  end
+
+  def user_not_authorized(exception)
+    flash[:alert] = exception.message
+    redirect_back(fallback_location: root_path)
   end
 end
