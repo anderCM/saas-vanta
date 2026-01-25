@@ -1,15 +1,15 @@
 class Enterprises::CreateEnterprise < BaseService
   attr_reader :enterprise
-  def initialize(user_id:, **kwargs)
+  def initialize(user_id:, params:)
     super()
     @user_id = user_id
-    @kwargs = kwargs
+    @params = params
     @enterprise = nil
   end
 
   def call
     validate_user(@user_id)
-    new_enterprise = Enterprise.new(@kwargs)
+    new_enterprise = Enterprise.new(@params)
     new_enterprise.status = "active"
     new_enterprise.save!
     @enterprise = new_enterprise

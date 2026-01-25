@@ -51,7 +51,7 @@ class CreateNewEnterpriseClient < BaseService
   end
 
   def create_enterprise_service
-    @create_enterprise_service ||= ::Enterprises::CreateEnterprise.new(user_id: @user_id, **enterprise_params)
+    @create_enterprise_service ||= ::Enterprises::CreateEnterprise.new(user_id: @user_id, params: enterprise_params)
   end
 
   def enterprise_params

@@ -1,4 +1,6 @@
 class Enterprise < ApplicationRecord
+  has_one_attached :logo
+
   # Asociations
   has_many :user_enterprises
   has_many :users, through: :user_enterprises
