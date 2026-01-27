@@ -48,6 +48,11 @@ gem "awesome_print", "~> 1.9", ">= 1.9.2"
 # Pagination
 gem "pagy", "~> 9.3"
 
+# Excel handling
+gem "roo", "~> 2.10"           # Read Excel/CSV files
+gem "caxlsx", "~> 4.1"         # Generate Excel files
+gem "caxlsx_rails", "~> 0.6"   # Rails integration for caxlsx
+
 # Use data_migrate for database migrations
 gem "data_migrate", "~> 11.3", ">= 11.3.1"
 

@@ -1,0 +1,145 @@
+<%
+  resource_labels = {
+    "Product" => "Productos",
+    "Provider" => "Proveedores",
+    "Customer" => "Clientes"
+  }
+  resource_label = resource_labels[@bulk_import.resource_type] || @bulk_import.resource_type
+%>
+
+<% content_for :page_title, "Detalle de Importacion" %>
+
+<div class="max-w-4xl mx-auto py-8 px-4">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-foreground">Importacion #<%= @bulk_import.id %></h1>
+        <%= render_import_status_badge(@bulk_import.status) %>
+      </div>
+      <p class="mt-1 text-sm text-muted-foreground">
+        <%= resource_label %> |
+        <%= @bulk_import.created_at.strftime("%d/%m/%Y %H:%M") %>
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to "Volver", bulk_imports_path(resource_type: @bulk_import.resource_type), class: "btn-secondary" %>
+      <%= link_to "Nueva Importacion",
+                  new_bulk_import_path(resource_type: @bulk_import.resource_type),
+                  class: "btn-primary" %>
+    </div>
+  </div>
+
+  <% if @bulk_import.processing? %>
+    <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <div>
+          <p class="font-medium text-blue-800 dark:text-blue-200">Procesando importacion...</p>
+          <p class="text-sm text-blue-600 dark:text-blue-400">Esta pagina se actualizara automaticamente.</p>
+        </div>
+      </div>
+    </div>
+    <meta http-equiv="refresh" content="5">
+  <% end %>
+
+  <% if @bulk_import.general_error.present? %>
+    <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <p class="font-medium text-red-800 dark:text-red-200">Error en la importacion</p>
+          <p class="text-sm text-red-600 dark:text-red-400"><%= @bulk_import.general_error %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="card text-center">
+      <p class="text-sm font-medium text-muted-foreground">Total de Filas</p>
+      <p class="mt-2 text-3xl font-bold text-foreground"><%= @bulk_import.total_rows %></p>
+    </div>
+    <div class="card text-center">
+      <p class="text-sm font-medium text-muted-foreground">Exitosos</p>
+      <p class="mt-2 text-3xl font-bold text-green-600 dark:text-green-400"><%= @bulk_import.successful_rows %></p>
+    </div>
+    <div class="card text-center">
+      <p class="text-sm font-medium text-muted-foreground">Fallidos</p>
+      <p class="mt-2 text-3xl font-bold <%= @bulk_import.failed_rows > 0 ? 'text-red-600 dark:text-red-400' : 'text-foreground' %>">
+        <%= @bulk_import.failed_rows %>
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-6 card">
+    <h3 class="text-lg font-medium text-foreground mb-4">Detalles de importación</h3>
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <dt class="text-sm font-medium text-muted-foreground">Archivo</dt>
+        <dd class="mt-1 text-sm text-foreground">
+          <%= link_to @bulk_import.original_filename,
+                      rails_blob_path(@bulk_import.file, disposition: "attachment"),
+                      class: "text-primary underline" %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-muted-foreground">Usuario</dt>
+        <dd class="mt-1 text-sm text-foreground">
+          <%= @bulk_import.user.first_name %> <%= @bulk_import.user.first_last_name %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-muted-foreground">Inicio</dt>
+        <dd class="mt-1 text-sm text-foreground">
+          <%= @bulk_import.started_at&.strftime("%d/%m/%Y %H:%M:%S") || "-" %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-muted-foreground">Fin</dt>
+        <dd class="mt-1 text-sm text-foreground">
+          <%= @bulk_import.completed_at&.strftime("%d/%m/%Y %H:%M:%S") || "-" %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-muted-foreground">Duracion</dt>
+        <dd class="mt-1 text-sm text-foreground"><%= @bulk_import.formatted_duration %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @bulk_import.error_details.any? %>
+    <div class="mt-6 card">
+      <h3 class="text-lg font-medium text-foreground mb-4">
+        Errores Detallados
+        <span class="text-sm font-normal text-muted-foreground">
+          (<%= @bulk_import.error_details.size %> registros)
+        </span>
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted/50">
+            <tr>
+              <th class="table-th text-left">Fila</th>
+              <th class="table-th text-left">Nombre</th>
+              <th class="table-th text-left">Error</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            <% @bulk_import.error_details.each do |error| %>
+              <tr>
+                <td class="px-4 py-3 text-sm text-foreground"><%= error["row"] %></td>
+                <td class="px-4 py-3 text-sm text-foreground"><%= error["name"] %></td>
+                <td class="px-4 py-3 text-sm text-red-600 dark:text-red-400"><%= error["error"] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

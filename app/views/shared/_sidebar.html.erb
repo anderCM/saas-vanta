@@ -14,7 +14,7 @@
       </div>
       <button
         type="button"
-        data-action="click->sidebar
+        data-action="click->sidebar#toggle"
         class="sidebar-collapse-btn"
         title="Colapsar/Expandir menú"
       >
@@ -25,14 +25,6 @@
           <%= sidebar_icon("chevrons-right", class: "w-[18px] h-[18px]") %>
         </span>
       </button>
-      <button
-        type="button"
-        data-action="click->sidebar
-        class="sidebar-close-btn"
-        title="Cerrar menú"
-      >
-        <%= sidebar_icon("x", class: "w-5 h-5") %>
-      </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -40,7 +32,9 @@
 
       <% if current_enterprise.present? %>
         <%= sidebar_link_to "Productos", products_path, icon: "package" %>
-        <%= sidebar_link_to "Proveedores", "#", icon: "truck" %>
+        <%= sidebar_link_to "Proveedores", providers_path, icon: "truck" %>
+        <%= sidebar_link_to "Clientes", customers_path, icon: "users" %>
+        <%= sidebar_link_to "Importaciones", bulk_imports_path, icon: "upload" %>
       <% end %>
 
       <% if Current.user&.super_admin? %>

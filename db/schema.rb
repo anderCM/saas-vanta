@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_20_100106) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_26_131235) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_100106) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "bulk_imports", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.bigint "enterprise_id", null: false
+    t.integer "failed_rows", default: 0
+    t.string "original_filename"
+    t.string "resource_type", null: false
+    t.jsonb "results", default: {}
+    t.datetime "started_at"
+    t.string "status", default: "pending", null: false
+    t.integer "successful_rows", default: 0
+    t.integer "total_rows", default: 0
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["enterprise_id", "resource_type"], name: "index_bulk_imports_on_enterprise_id_and_resource_type"
+    t.index ["enterprise_id"], name: "index_bulk_imports_on_enterprise_id"
+    t.index ["resource_type"], name: "index_bulk_imports_on_resource_type"
+    t.index ["status"], name: "index_bulk_imports_on_status"
+    t.index ["user_id"], name: "index_bulk_imports_on_user_id"
+  end
+
+  create_table "customers", force: :cascade do |t|
+    t.string "address"
+    t.datetime "created_at", null: false
+    t.decimal "credit_limit", precision: 10, scale: 2, default: "0.0", null: false
+    t.string "email"
+    t.bigint "enterprise_id", null: false
+    t.string "name", null: false
+    t.integer "payment_terms", default: 0, null: false
+    t.string "phone_number"
+    t.string "tax_id"
+    t.string "tax_id_type", default: "ruc", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enterprise_id", "tax_id"], name: "idx_customers_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
+    t.index ["enterprise_id"], name: "index_customers_on_enterprise_id"
   end
 
   create_table "enterprises", force: :cascade do |t|
@@ -154,6 +191,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_100106) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "bulk_imports", "enterprises"
+  add_foreign_key "bulk_imports", "users"
+  add_foreign_key "customers", "enterprises"
   add_foreign_key "products", "enterprises"
   add_foreign_key "products", "providers"
   add_foreign_key "providers", "enterprises"

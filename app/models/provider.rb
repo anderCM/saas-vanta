@@ -1,6 +1,7 @@
 class Provider < ApplicationRecord
   # Associations
   belongs_to :enterprise
+  has_many :products, dependent: :nullify
 
   # Validations
   validates :name, presence: true

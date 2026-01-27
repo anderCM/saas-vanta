@@ -31,7 +31,7 @@ RSpec.describe Products::CreateProducts do
     ]
   end
 
-  subject { described_class.new(products: products_input, enterprise: enterprise) }
+  subject { described_class.new(records: products_input, enterprise: enterprise) }
 
   describe '#call' do
     context 'when all products are valid' do

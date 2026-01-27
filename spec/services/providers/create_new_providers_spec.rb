@@ -20,7 +20,7 @@ RSpec.describe Providers::CreateNewProviders do
     ]
   end
 
-  subject { described_class.new(providers: providers_input, enterprise: enterprise) }
+  subject { described_class.new(records: providers_input, enterprise: enterprise) }
 
   describe '#call' do
     context 'when all providers are valid' do

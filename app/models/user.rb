@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :enterprises, through: :user_enterprises
   has_many :user_enterprise_roles, through: :user_enterprises
   has_many :roles, through: :user_enterprise_roles
+  has_many :bulk_imports, dependent: :nullify
 
   # Validations
   validates :first_name, :first_last_name, :email_address, presence: true

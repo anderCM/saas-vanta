@@ -33,7 +33,8 @@ module ApplicationHelper
       "chevrons-left" => '<path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>',
       "chevrons-right" => '<path stroke-linecap="round" stroke-linejoin="round" d="M13 17l5-5-5-5M6 17l5-5-5-5"/>',
       "x" => '<path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"/>',
-      "menu" => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>'
+      "menu" => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>',
+      "upload" => '<path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>'
     }
 
     css_class = options[:class] || "w-5 h-5"

@@ -1,0 +1,87 @@
+<div class="max-w-4xl mx-auto py-8 px-4">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-foreground"><%= @provider.name %></h1>
+      </div>
+      <p class="mt-1 text-sm text-muted-foreground">
+        <% if @provider.tax_id.present? %>
+          <%= format_tax_id(@provider.tax_id) %> |
+        <% end %>
+        Registrado <%= time_ago_in_words(@provider.created_at) %> atras
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to "Volver", providers_path, class: "btn-secondary" %>
+      <% if policy(@provider).update? %>
+        <%= link_to "Editar", edit_provider_path(@provider), class: "btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="card">
+        <h3 class="text-lg font-medium text-foreground mb-4">Informacion General</h3>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <dt class="text-sm font-medium text-muted-foreground">Nombre</dt>
+            <dd class="mt-1 text-sm text-foreground"><%= @provider.name %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-muted-foreground">RUC/DNI</dt>
+            <dd class="mt-1 text-sm text-foreground"><%= @provider.tax_id.presence || "-" %></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="card">
+        <h3 class="text-lg font-medium text-foreground mb-4">Contacto</h3>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <dt class="text-sm font-medium text-muted-foreground">Email</dt>
+            <dd class="mt-1 text-sm text-foreground">
+              <% if @provider.email.present? %>
+                <%= mail_to @provider.email, @provider.email, class: "text-primary hover:underline" %>
+              <% else %>
+                -
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-muted-foreground">Telefono</dt>
+            <dd class="mt-1 text-sm text-foreground">
+              <% if @provider.phone_number.present? %>
+                <%= link_to @provider.phone_number, "tel:#{@provider.phone_number}", class: "text-primary hover:underline" %>
+              <% else %>
+                -
+              <% end %>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="card">
+        <h3 class="text-lg font-medium text-foreground mb-4">Productos Asociados</h3>
+        <% products_count = @provider.products.count rescue 0 %>
+        <div class="text-center p-4 bg-muted/30 rounded-lg">
+          <span class="text-3xl font-bold text-foreground"><%= products_count %></span>
+          <p class="text-sm text-muted-foreground mt-1">productos</p>
+        </div>
+      </div>
+
+      <% if policy(@provider).destroy? %>
+        <div class="card">
+          <h3 class="text-lg font-medium text-foreground mb-4">Zona de Peligro</h3>
+          <%= button_to "Eliminar Proveedor",
+              @provider,
+              method: :delete,
+              class: "w-full btn-destructive",
+              data: { turbo_confirm: "Estas seguro de eliminar este proveedor? Esta accion no se puede deshacer." } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

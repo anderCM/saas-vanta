@@ -1,0 +1,40 @@
+class Customer < ApplicationRecord
+  # Associations
+  belongs_to :enterprise
+
+  # Validations
+  validates :name, presence: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validate :validate_phone_number
+  validate :validate_tax_id
+  validates :credit_limit, numericality: { greater_than_or_equal_to: 0 }
+  validates :payment_terms, numericality: { greater_than_or_equal_to: 0, only_integer: true }
+
+  # Enums
+  enum :tax_id_type, {
+    ruc: 'ruc',
+    dni: 'dni',
+    no_document: 'no_document'
+  }
+
+  private
+
+  def validate_phone_number
+    Peru::PhoneValidator.new(attributes: [ :phone_number ], allow_blank: true).validate_each(self, :phone_number, phone_number)
+  end
+
+  def validate_tax_id
+    return if no_document?
+
+    if tax_id.blank?
+      errors.add(:base, "DNI o RUC es requerido")
+      return
+    end
+
+    if ruc?
+      Peru::TaxIdValidator.new(attributes: [:tax_id]).validate_each(self, :tax_id, tax_id)
+    elsif dni?
+      Peru::TaxIdDniValidator.new(attributes: [:tax_id]).validate_each(self, :tax_id, tax_id)
+    end
+  end
+end

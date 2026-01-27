@@ -17,6 +17,14 @@ Rails.application.routes.draw do
   end
 
   resources :products
+  resources :providers
+  resources :customers
+
+  resources :bulk_imports, only: [ :index, :show, :new, :create ] do
+    collection do
+      get :template
+    end
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
