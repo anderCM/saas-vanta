@@ -28,7 +28,18 @@
         <%= f.text_field :tax_id, class: "form-input", placeholder: "Opcional" %>
         <p class="mt-1 text-xs text-muted-foreground">11 digitos</p>
       </div>
-
+      <div class="sm:col-span-3">
+        <%= render "shared/async_combobox",
+            name: "provider[ubigeo_id]",
+            src: ubigeos_path,
+            value: provider.ubigeo_id,
+            display: provider.ubigeo&.combobox_display,
+            label: "Ciudad / Distrito",
+            optional: true,
+            placeholder: "Buscar ciudad...",
+            hint: "Escribe para buscar",
+            size: "full" %>
+      </div>
     </div>
   </div>
 

@@ -94,30 +94,40 @@ module BulkImports
           "Nombre",
           "RUC/DNI",
           "Email",
-          "Telefono"
+          "Telefono",
+          "Departamento",
+          "Provincia",
+          "Distrito"
         ],
         examples: [
           [
             "Proveedor de Prueba 1",
             "20123456789",
             "prueba@ejemplo.com",
-            "987654321"
+            "987654321",
+            "Lambayeque",
+            "Chiclayo",
+            "Chiclayo"
           ],
           [
             "Proveedor Test 2",
             "12345678",
             "test@ejemplo.com",
-            "912345678"
+            "912345678",
+            "Lima",
+            "Lima",
+            "Miraflores"
           ]
         ],
-        column_widths: [ 35, 15, 30, 15 ],
-        dropdowns: {},
+        column_widths: [ 35, 15, 30, 15, 18, 18, 18 ],
+        dropdowns: :ubigeo,
         instructions: [
           "INSTRUCCIONES:",
           "1. Las primeras 2 filas de ejemplo seran ignoradas automaticamente",
           "2. Agregue sus proveedores debajo de las filas de ejemplo",
           "3. RUC/DNI: 11 digitos para RUC, 8 digitos para DNI",
-          "4. Telefono: 9 digitos para celular"
+          "4. Telefono: 9 digitos para celular",
+          "5. Ubicacion: Seleccione Departamento, Provincia y Distrito de las listas"
         ]
       },
       "Customer" => {
@@ -128,6 +138,9 @@ module BulkImports
           "Email",
           "Telefono",
           "Direccion",
+          "Departamento",
+          "Provincia",
+          "Distrito",
           "Limite Credito",
           "Dias Credito"
         ],
@@ -139,6 +152,9 @@ module BulkImports
             "prueba@ejemplo.com",
             "987654321",
             "Av. Principal 123",
+            "Lambayeque",
+            "Chiclayo",
+            "Chiclayo",
             "5000.00",
             "30"
           ],
@@ -149,28 +165,23 @@ module BulkImports
             "test@ejemplo.com",
             "912345678",
             "Jr. Secundario 456",
+            "Lima",
+            "Lima",
+            "Miraflores",
             "1000.00",
             "15"
           ]
         ],
-        column_widths: [ 30, 18, 18, 25, 15, 35, 15, 15 ],
-        dropdowns: {
-          1 => { # Tipo Documento
-            name: "TipoDocumento",
-            options: [
-              { label: "RUC", value: "ruc" },
-              { label: "DNI", value: "dni" },
-              { label: "Ninguno", value: "no_document" }
-            ]
-          }
-        },
+        column_widths: [ 30, 18, 18, 25, 15, 35, 18, 18, 18, 15, 15 ],
+        dropdowns: :ubigeo_with_tipo_documento,
         instructions: [
           "INSTRUCCIONES:",
           "1. Las primeras 2 filas de ejemplo seran ignoradas automaticamente (contienen 'prueba' o 'test')",
           "2. Agregue sus clientes debajo de las filas de ejemplo",
           "3. Tipo Documento: RUC (11 digitos), DNI (8 digitos), o Ninguno",
-          "4. Limite Credito: Monto maximo de credito permitido (use punto como decimal)",
-          "5. Dias Credito: Plazo de pago en dias (0 = solo contado)"
+          "4. Ubicacion: Seleccione Departamento, Provincia y Distrito de las listas",
+          "5. Limite Credito: Monto maximo de credito permitido (use punto como decimal)",
+          "6. Dias Credito: Plazo de pago en dias (0 = solo contado)"
         ]
       }
     }.freeze
@@ -288,11 +299,60 @@ module BulkImports
     # --- Dropdown functionality ---
 
     def has_dropdowns?
-      dropdowns.present?
+      resolved_dropdowns.present?
     end
 
     def dropdowns
-      @template_config[:dropdowns] || {}
+      resolved_dropdowns
+    end
+
+    def resolved_dropdowns
+      @resolved_dropdowns ||= resolve_dropdowns(@template_config[:dropdowns])
+    end
+
+    def resolve_dropdowns(config)
+      return {} if config.blank?
+
+      case config
+      when :ubigeo
+        build_ubigeo_dropdowns(ubigeo_start_column: 4)
+      when :ubigeo_with_tipo_documento
+        tipo_doc_dropdown.merge(build_ubigeo_dropdowns(ubigeo_start_column: 6))
+      when Hash
+        config
+      else
+        {}
+      end
+    end
+
+    def tipo_doc_dropdown
+      {
+        1 => {
+          name: "TipoDocumento",
+          options: [
+            { label: "RUC", value: "ruc" },
+            { label: "DNI", value: "dni" },
+            { label: "Ninguno", value: "no_document" }
+          ]
+        }
+      }
+    end
+
+    def build_ubigeo_dropdowns(ubigeo_start_column:)
+      {
+        ubigeo_start_column => {
+          name: "Departamento",
+          options: Ubigeo.departments.order(:name).map { |u| { label: u.name, value: u.name } }
+        },
+        ubigeo_start_column + 1 => {
+          name: "Provincia",
+          options: Ubigeo.provinces.order(:name).map { |u| { label: u.name, value: u.name } }
+        },
+        ubigeo_start_column + 2 => {
+          name: "Distrito",
+          options: Ubigeo.districts.order(:name).map { |u| { label: u.name, value: u.name } }
+        }
+      }
     end
 
     def create_options_sheet(workbook)

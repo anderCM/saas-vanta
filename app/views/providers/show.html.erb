@@ -58,6 +58,10 @@
               <% end %>
             </dd>
           </div>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-muted-foreground">Ubicacion</dt>
+            <dd class="mt-1 text-sm text-foreground"><%= @provider.ubigeo&.full_path.presence || "-" %></dd>
+          </div>
         </dl>
       </div>
     </div>

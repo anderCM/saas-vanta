@@ -74,9 +74,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_131235) do
     t.string "phone_number"
     t.string "tax_id"
     t.string "tax_id_type", default: "ruc", null: false
+    t.bigint "ubigeo_id"
     t.datetime "updated_at", null: false
     t.index ["enterprise_id", "tax_id"], name: "idx_customers_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
     t.index ["enterprise_id"], name: "index_customers_on_enterprise_id"
+    t.index ["ubigeo_id"], name: "index_customers_on_ubigeo_id"
   end
 
   create_table "enterprises", force: :cascade do |t|
@@ -126,9 +128,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_131235) do
     t.string "name", null: false
     t.string "phone_number"
     t.string "tax_id"
+    t.bigint "ubigeo_id"
     t.datetime "updated_at", null: false
     t.index ["enterprise_id", "tax_id"], name: "idx_providers_on_tax_id_unq_not_null", unique: true, where: "(tax_id IS NOT NULL)"
     t.index ["enterprise_id"], name: "index_providers_on_enterprise_id"
+    t.index ["ubigeo_id"], name: "index_providers_on_ubigeo_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -142,11 +146,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_131235) do
 
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.bigint "enterprise_id"
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.bigint "user_id", null: false
+    t.index ["enterprise_id"], name: "index_sessions_on_enterprise_id"
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "ubigeos", force: :cascade do |t|
+    t.string "code", limit: 6, null: false
+    t.datetime "created_at", null: false
+    t.string "level", null: false
+    t.string "name", null: false
+    t.bigint "parent_id"
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_ubigeos_on_code", unique: true
+    t.index ["level", "parent_id"], name: "index_ubigeos_on_level_and_parent_id"
+    t.index ["level"], name: "index_ubigeos_on_level"
+    t.index ["parent_id"], name: "index_ubigeos_on_parent_id"
   end
 
   create_table "user_enterprise_roles", force: :cascade do |t|
@@ -194,10 +213,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_131235) do
   add_foreign_key "bulk_imports", "enterprises"
   add_foreign_key "bulk_imports", "users"
   add_foreign_key "customers", "enterprises"
+  add_foreign_key "customers", "ubigeos"
   add_foreign_key "products", "enterprises"
   add_foreign_key "products", "providers"
   add_foreign_key "providers", "enterprises"
+  add_foreign_key "providers", "ubigeos"
+  add_foreign_key "sessions", "enterprises"
   add_foreign_key "sessions", "users"
+  add_foreign_key "ubigeos", "ubigeos", column: "parent_id"
   add_foreign_key "user_enterprise_roles", "roles"
   add_foreign_key "user_enterprise_roles", "user_enterprises"
   add_foreign_key "user_enterprises", "enterprises"

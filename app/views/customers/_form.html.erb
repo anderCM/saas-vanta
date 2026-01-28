@@ -47,7 +47,18 @@
         <% end %>
         <%= f.text_field :address, class: "form-input", placeholder: "Av. Principal 123" %>
       </div>
-
+      <div class="sm:col-span-3">
+        <%= render "shared/async_combobox",
+            name: "customer[ubigeo_id]",
+            src: ubigeos_path,
+            value: customer.ubigeo_id,
+            display: customer.ubigeo&.combobox_display,
+            label: "Ciudad / Distrito",
+            optional: true,
+            placeholder: "Buscar ciudad...",
+            hint: "Escribe para buscar",
+            size: "full" %>
+      </div>
     </div>
   </div>
 

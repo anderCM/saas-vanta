@@ -164,6 +164,11 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    hotwire_combobox (0.4.0)
+      platform_agent (>= 1.0.1)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
     htmlentities (4.4.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
@@ -261,6 +266,9 @@ GEM
     pg (1.6.2-x86_64-darwin)
     pg (1.6.2-x86_64-linux)
     pg (1.6.2-x86_64-linux-musl)
+    platform_agent (1.0.1)
+      activesupport (>= 5.2.0)
+      useragent (~> 0.16.3)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -481,6 +489,7 @@ DEPENDENCIES
   debug
   factory_bot_rails (~> 6.5)
   faker (~> 3.5)
+  hotwire_combobox
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

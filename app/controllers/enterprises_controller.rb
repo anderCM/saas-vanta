@@ -9,6 +9,7 @@ class EnterprisesController < ApplicationController
   def select
     if Current.user.enterprises.exists?(params[:id])
       session[:enterprise_id] = params[:id]
+      Current.session.update!(enterprise_id: params[:id])
       redirect_to root_path
     else
       redirect_to enterprises_path, alert: "Invalid enterprise selected."

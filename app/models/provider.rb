@@ -1,6 +1,7 @@
 class Provider < ApplicationRecord
   # Associations
   belongs_to :enterprise
+  belongs_to :ubigeo, optional: true
   has_many :products, dependent: :nullify
 
   # Validations

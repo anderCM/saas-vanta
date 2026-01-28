@@ -1,5 +1,7 @@
 module Customers
   class ImportOrchestrator < BaseService
+    include UbigeoLookup
+
     # Maps Excel column names to Customer attributes
     COLUMN_MAPPING = {
       nombre: :name,
@@ -8,6 +10,9 @@ module Customers
       email: :email,
       telefono: :phone_number,
       direccion: :address,
+      departamento: :_departamento,
+      provincia: :_provincia,
+      distrito: :_distrito,
       limite_credito: :credit_limit,
       dias_credito: :payment_terms
     }.freeze
@@ -18,6 +23,7 @@ module Customers
       super()
       @bulk_import = bulk_import
       @enterprise = bulk_import.enterprise
+      initialize_ubigeo_cache
     end
 
     def call
@@ -94,11 +100,21 @@ module Customers
 
     def build_customer_attributes(row)
       attrs = {}
+      ubigeo_data = {}
 
       COLUMN_MAPPING.each do |excel_col, attr_name|
         value = row[excel_col]
-        attrs[attr_name] = normalize_value(attr_name, value)
+
+        if attr_name.to_s.start_with?("_")
+          # Temporary ubigeo fields
+          ubigeo_data[attr_name] = value.to_s.strip if value.present?
+        else
+          attrs[attr_name] = normalize_value(attr_name, value)
+        end
       end
+
+      # Resolve ubigeo_id from departamento, provincia, distrito
+      attrs[:ubigeo_id] = resolve_ubigeo_from_data(ubigeo_data)
 
       # Set defaults
       attrs[:tax_id_type] ||= "no_document"

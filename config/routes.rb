@@ -19,10 +19,17 @@ Rails.application.routes.draw do
   resources :products
   resources :providers
   resources :customers
+  resources :ubigeos, only: [:index]
 
   resources :bulk_imports, only: [ :index, :show, :new, :create ] do
     collection do
       get :template
+    end
+  end
+
+  resources :users, except: [ :destroy ] do
+    member do
+      patch :toggle_status
     end
   end
 

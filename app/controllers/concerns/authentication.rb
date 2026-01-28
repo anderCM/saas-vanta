@@ -46,6 +46,15 @@ module Authentication
 
   def resume_session
     Current.session ||= find_session_by_cookie
+    restore_enterprise_from_session if Current.session
+    Current.session
+  end
+
+  def restore_enterprise_from_session
+    return if session[:enterprise_id].present?
+    return unless Current.session.enterprise_id
+
+    session[:enterprise_id] = Current.session.enterprise_id
   end
 
   def find_session_by_cookie

@@ -1,11 +1,16 @@
 module Providers
   class ImportOrchestrator < BaseService
+    include UbigeoLookup
+
     # Maps Excel column names to Provider attributes
     COLUMN_MAPPING = {
       nombre: :name,
       rucdni: :tax_id,
       email: :email,
-      telefono: :phone_number
+      telefono: :phone_number,
+      departamento: :_departamento,
+      provincia: :_provincia,
+      distrito: :_distrito
     }.freeze
 
     REQUIRED_COLUMNS = [ :nombre ].freeze
@@ -14,6 +19,7 @@ module Providers
       super()
       @bulk_import = bulk_import
       @enterprise = bulk_import.enterprise
+      initialize_ubigeo_cache
     end
 
     def call
@@ -90,11 +96,21 @@ module Providers
 
     def build_provider_attributes(row)
       attrs = {}
+      ubigeo_data = {}
 
       COLUMN_MAPPING.each do |excel_col, attr_name|
         value = row[excel_col]
-        attrs[attr_name] = normalize_value(attr_name, value)
+
+        if attr_name.to_s.start_with?("_")
+          # Temporary ubigeo fields
+          ubigeo_data[attr_name] = value.to_s.strip if value.present?
+        else
+          attrs[attr_name] = normalize_value(attr_name, value)
+        end
       end
+
+      # Resolve ubigeo_id from departamento, provincia, distrito
+      attrs[:ubigeo_id] = resolve_ubigeo_from_data(ubigeo_data)
 
       attrs.compact
     end

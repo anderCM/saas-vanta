@@ -65,7 +65,8 @@ class ProvidersController < ApplicationController
       :name,
       :tax_id,
       :email,
-      :phone_number
+      :phone_number,
+      :ubigeo_id
     )
   end
 end

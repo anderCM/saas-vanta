@@ -68,6 +68,7 @@ class CustomersController < ApplicationController
       :email,
       :phone_number,
       :address,
+      :ubigeo_id,
       :credit_limit,
       :payment_terms
     )

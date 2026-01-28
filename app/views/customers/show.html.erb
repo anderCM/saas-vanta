@@ -46,6 +46,10 @@
             <dt class="text-sm font-medium text-muted-foreground">Direccion</dt>
             <dd class="mt-1 text-sm text-foreground"><%= @customer.address.presence || "-" %></dd>
           </div>
+          <div>
+            <dt class="text-sm font-medium text-muted-foreground">Ubicacion</dt>
+            <dd class="mt-1 text-sm text-foreground"><%= @customer.ubigeo&.full_path.presence || "-" %></dd>
+          </div>
         </dl>
       </div>
 

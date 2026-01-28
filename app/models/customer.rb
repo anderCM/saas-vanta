@@ -1,6 +1,7 @@
 class Customer < ApplicationRecord
   # Associations
   belongs_to :enterprise
+  belongs_to :ubigeo, optional: true
 
   # Validations
   validates :name, presence: true

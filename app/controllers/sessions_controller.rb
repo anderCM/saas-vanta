@@ -34,7 +34,9 @@ class SessionsController < ApplicationController
       if user.enterprises.count > 1
         enterprises_path
       elsif user.enterprises.count == 1
-        session[:enterprise_id] = user.enterprises.first.id
+        enterprise = user.enterprises.first
+        session[:enterprise_id] = enterprise.id
+        Current.session.update!(enterprise_id: enterprise.id)
         session.delete(:return_to_after_authenticating) || root_path
       else
         session.delete(:return_to_after_authenticating) || root_path
