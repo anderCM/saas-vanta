@@ -1,0 +1,145 @@
+<div class="max-w-5xl mx-auto py-8 px-4">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-foreground"><%= @customer_quote.code %></h1>
+        <span class="<%= @customer_quote.status_badge_class %>"><%= @customer_quote.status_label %></span>
+      </div>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Creada por <%= @customer_quote.created_by.first_name %> el <%= l(@customer_quote.created_at, format: :long) %>
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <%= link_to "Volver", customer_quotes_path, class: "btn-secondary" %>
+      <%= link_to "Descargar PDF", pdf_customer_quote_path(@customer_quote), class: "btn-secondary", data: { turbo: false } %>
+
+      <% if @customer_quote.can_edit? && policy(@customer_quote).update? %>
+        <%= link_to "Editar", edit_customer_quote_path(@customer_quote), class: "btn-secondary" %>
+      <% end %>
+
+      <% if @customer_quote.can_accept? && policy(@customer_quote).accept? %>
+        <%= button_to "Aceptar", accept_customer_quote_path(@customer_quote),
+            method: :patch,
+            class: "btn-primary",
+            data: { turbo_confirm: "Aceptar esta cotizacion?" } %>
+      <% end %>
+
+      <% if @customer_quote.can_reject? && policy(@customer_quote).reject? %>
+        <%= button_to "Rechazar", reject_customer_quote_path(@customer_quote),
+            method: :patch,
+            class: "btn-destructive",
+            data: { turbo_confirm: "Rechazar esta cotizacion? Esta accion no se puede deshacer." } %>
+      <% end %>
+
+      <% if @customer_quote.can_expire? && policy(@customer_quote).expire? %>
+        <%= button_to "Marcar Expirada", expire_customer_quote_path(@customer_quote),
+            method: :patch,
+            class: "btn-secondary",
+            data: { turbo_confirm: "Marcar como expirada?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="card">
+      <h3 class="text-sm font-medium text-muted-foreground mb-2">Cliente</h3>
+      <p class="text-lg font-semibold text-foreground"><%= @customer_quote.customer.name %></p>
+      <% if @customer_quote.customer.tax_id.present? %>
+        <p class="text-sm text-muted-foreground">RUC: <%= @customer_quote.customer.tax_id %></p>
+      <% end %>
+    </div>
+
+    <div class="card">
+      <h3 class="text-sm font-medium text-muted-foreground mb-2">Vendedor</h3>
+      <p class="text-foreground font-medium"><%= @customer_quote.seller.combobox_display %></p>
+      <% if @customer_quote.seller.phone_number.present? %>
+        <p class="text-sm text-muted-foreground">Tel: <%= @customer_quote.seller.phone_number %></p>
+      <% end %>
+    </div>
+
+    <div class="card">
+      <h3 class="text-sm font-medium text-muted-foreground mb-2">Fechas</h3>
+      <p class="text-foreground">
+        <span class="font-medium">Emision:</span> <%= l(@customer_quote.issue_date, format: :long) %>
+      </p>
+      <% if @customer_quote.expiration_date.present? %>
+        <p class="text-foreground">
+          <span class="font-medium">Vencimiento:</span> <%= l(@customer_quote.expiration_date, format: :long) %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @customer_quote.destination.present? %>
+    <div class="card mb-8">
+      <h3 class="text-sm font-medium text-muted-foreground mb-2">Destino</h3>
+      <p class="text-foreground"><%= @customer_quote.destination.full_path %></p>
+    </div>
+  <% end %>
+
+  <div class="card mb-8">
+    <h3 class="text-lg font-medium text-foreground mb-4">Items</h3>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-border">
+        <thead class="bg-muted/50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">N</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Producto</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Cantidad</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Precio Unit.</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% @customer_quote.items.includes(:product).each_with_index do |item, index| %>
+            <tr>
+              <td class="px-4 py-3 text-sm text-muted-foreground"><%= index + 1 %></td>
+              <td class="px-4 py-3">
+                <p class="text-sm font-medium text-foreground"><%= item.product.name %></p>
+                <% if item.product.sku.present? %>
+                  <p class="text-xs text-muted-foreground">SKU: <%= item.product.sku %></p>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-sm text-foreground text-right">
+                <%= item.quantity %> <%= item.unit_label %>
+              </td>
+              <td class="px-4 py-3 text-sm text-foreground text-right">
+                S/ <%= number_with_precision(item.unit_price, precision: 2, delimiter: ",") %>
+              </td>
+              <td class="px-4 py-3 text-sm font-medium text-foreground text-right">
+                S/ <%= number_with_precision(item.total, precision: 2, delimiter: ",") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 border-t border-border pt-4">
+      <div class="flex justify-end">
+        <dl class="space-y-2 text-sm w-64">
+          <div class="flex justify-between">
+            <dt class="text-muted-foreground">Subtotal</dt>
+            <dd class="font-medium text-foreground">S/ <%= number_with_precision(@customer_quote.subtotal, precision: 2, delimiter: ",") %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-muted-foreground">IGV (<%= (PeruTax::IGV_RATE * 100).to_i %>%)</dt>
+            <dd class="font-medium text-foreground">S/ <%= number_with_precision(@customer_quote.tax, precision: 2, delimiter: ",") %></dd>
+          </div>
+          <div class="flex justify-between border-t border-border pt-2">
+            <dt class="font-semibold text-foreground">Total</dt>
+            <dd class="font-bold text-foreground text-lg">S/ <%= number_with_precision(@customer_quote.total, precision: 2, delimiter: ",") %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <% if @customer_quote.notes.present? %>
+    <div class="card">
+      <h3 class="text-lg font-medium text-foreground mb-2">Notas</h3>
+      <p class="text-foreground whitespace-pre-wrap"><%= @customer_quote.notes %></p>
+    </div>
+  <% end %>
+</div>

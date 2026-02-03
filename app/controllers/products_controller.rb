@@ -8,6 +8,25 @@ class ProductsController < ApplicationController
     @pagy, @products = pagy(products)
   end
 
+  def search
+    authorize Product, :index?
+    query = params[:q].to_s.strip
+
+    @products = if query.present?
+      current_enterprise.products
+                       .where(status: :active)
+                       .where("LOWER(name) LIKE :query OR LOWER(sku) LIKE :query", query: "%#{query.downcase}%")
+                       .order(:name)
+                       .limit(20)
+    else
+      current_enterprise.products.where(status: :active).order(:name).limit(20)
+    end
+
+    respond_to do |format|
+      format.html { render layout: false }
+    end
+  end
+
   def show
     authorize @product
   end

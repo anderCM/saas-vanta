@@ -202,6 +202,37 @@ body {
   @apply text-primary;
 }
 
+/* Badges */
+.badge-secondary {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-muted text-muted-foreground;
+}
+
+.badge-info {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-blue-100 text-blue-800;
+}
+
+.dark .badge-info {
+  @apply bg-blue-900/30 text-blue-300;
+}
+
+.badge-success {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-primary/10 text-primary;
+}
+
+.badge-destructive {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-destructive/10 text-destructive;
+}
+
+/* Buttons - Success */
+.btn-success {
+  @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium transition-all;
+  @apply hover:bg-primary/90;
+}
+
 /* Links */
 .link-primary {
   @apply text-primary hover:text-primary/80 transition-colors;

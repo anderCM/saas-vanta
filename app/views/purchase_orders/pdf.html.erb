@@ -1,0 +1,85 @@
+<% content_for :title, @purchase_order.code %>
+
+<% content_for :head do %>
+  <%= render "shared/documents/pdf_styles" %>
+<% end %>
+
+<% enterprise = @purchase_order.enterprise %>
+<% provider = @purchase_order.provider %>
+
+<div class="doc">
+  <%= render "shared/documents/pdf_header",
+    enterprise: enterprise,
+    document_title: "ORDEN DE COMPRA",
+    document_code: @purchase_order.code,
+    document_date: @purchase_order.issue_date %>
+
+  <table class="info-grid"><tr>
+    <td>
+      <div class="info-card">
+        <div class="info-card-title">Proveedor</div>
+        <div class="info-row"><span class="label">Nombre</span><span class="value"><%= provider.name %></span></div>
+        <% if provider.tax_id.present? %>
+          <div class="info-row"><span class="label">RUC</span><span class="value"><%= provider.tax_id %></span></div>
+        <% end %>
+        <% if provider.email.present? %>
+          <div class="info-row"><span class="label">Email</span><span class="value"><%= provider.email %></span></div>
+        <% end %>
+        <% if provider.phone_number.present? %>
+          <div class="info-row"><span class="label">Telefono</span><span class="value"><%= provider.phone_number %></span></div>
+        <% end %>
+      </div>
+    </td>
+    <td class="spacer"></td>
+    <td>
+      <div class="info-card">
+        <div class="info-card-title">Detalles</div>
+        <% if @purchase_order.customer.present? %>
+          <div class="info-row"><span class="label">Cliente</span><span class="value"><%= @purchase_order.customer.name %></span></div>
+        <% end %>
+        <% if @purchase_order.expected_date.present? %>
+          <div class="info-row"><span class="label">Entrega esperada</span><span class="value"><%= l(@purchase_order.expected_date, format: :long) %></span></div>
+        <% end %>
+        <% if @purchase_order.destination.present? %>
+          <div class="info-row"><span class="label">Destino</span><span class="value"><%= @purchase_order.destination.full_path %></span></div>
+        <% end %>
+      </div>
+    </td>
+  </tr></table>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width:40%">Descripcion</th>
+        <th class="r">Cant.</th>
+        <th class="r">Cap.</th>
+        <th class="r">P. Unit.</th>
+        <th class="r">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @purchase_order.items.includes(:product).each_with_index do |item, i| %>
+        <tr class="<%= i.even? ? 'even' : '' %>">
+          <td>
+            <div class="item-name"><%= item.product.name %></div>
+            <% if item.product.sku.present? %>
+              <div class="item-sku">SKU: <%= item.product.sku %></div>
+            <% end %>
+          </td>
+          <td class="r"><%= item.quantity %></td>
+          <td class="r"><%= item.product.units_per_package %> <%= item.product.unit %></td>
+          <td class="r">S/ <%= number_with_precision(item.unit_price, precision: 2, delimiter: ",") %></td>
+          <td class="r">S/ <%= number_with_precision(item.total, precision: 2, delimiter: ",") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= render "shared/documents/pdf_totals",
+    subtotal: @purchase_order.subtotal,
+    tax: @purchase_order.tax,
+    total: @purchase_order.total %>
+
+  <%= render "shared/documents/pdf_footer",
+    notes: @purchase_order.notes %>
+</div>

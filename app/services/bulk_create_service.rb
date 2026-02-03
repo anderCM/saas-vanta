@@ -61,9 +61,9 @@ class BulkCreateService < BaseService
   # @return [Array<Hash, Hash>] [attributes, metadata]
   def extract_attrs_and_meta(record_data)
     if record_data.key?(:attrs)
-      [record_data[:attrs], record_data[:meta] || {}]
+      [ record_data[:attrs], record_data[:meta] || {} ]
     else
-      [record_data, {}]
+      [ record_data, {} ]
     end
   end
 

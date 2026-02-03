@@ -86,6 +86,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
+# PDF generation from HTML
+gem "wicked_pdf", "~> 2.8"
+gem "wkhtmltopdf-binary", "~> 0.12"
+
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
 
 gem "shoulda-matchers", "~> 7.0", groups: [ :development, :test ]

@@ -8,6 +8,25 @@ class UsersController < ApplicationController
     @pagy, @users = pagy(users)
   end
 
+  def search
+    authorize User, :index?
+    query = params[:q].to_s.strip
+
+    @users_results = if query.present?
+      current_enterprise.users
+                       .where(status: :active)
+                       .where("LOWER(first_name) LIKE :q OR LOWER(first_last_name) LIKE :q OR LOWER(email_address) LIKE :q", q: "%#{query.downcase}%")
+                       .order(:first_name)
+                       .limit(20)
+    else
+      current_enterprise.users.where(status: :active).order(:first_name).limit(20)
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   def show
     authorize @user
   end

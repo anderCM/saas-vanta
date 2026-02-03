@@ -1,0 +1,111 @@
+<%# Shared PDF styles for documents %>
+<style>
+  .doc { width: 100%; }
+
+  /* Header */
+  .header {
+    background-color: #1F2937;
+    color: #fff;
+    padding: 20px 24px;
+    display: table;
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+  }
+  .header-left, .header-right { display: table-cell; vertical-align: middle; }
+  .header-left { width: 60%; }
+  .header-right { width: 40%; text-align: right; }
+  .header img.logo { width: 80px; height: 80px; object-fit: contain; border-radius: 6px; vertical-align: middle; margin-right: 14px; }
+  .header .company { font-size: 22px; font-weight: 700; vertical-align: middle; }
+  .header .title { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .header .code { font-size: 24px; font-weight: 700; margin-top: 2px; }
+  .header .date { font-size: 12px; color: #D1D5DB; margin-top: 2px; }
+
+  .contact-bar {
+    background-color: #F3F4F6;
+    padding: 10px 24px;
+    font-size: 12px;
+    color: #6B7280;
+  }
+
+  /* Info cards */
+  .info-grid { width: 100%; margin-top: 18px; }
+  .info-grid td { width: 49%; vertical-align: top; }
+  .info-grid td.spacer { width: 2%; }
+  .info-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .info-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .info-row { font-size: 13px; margin-bottom: 6px; display: table; width: 100%; }
+  .info-row .label { color: #6B7280; display: table-cell; white-space: nowrap; }
+  .info-row .value { font-weight: 600; color: #111827; display: table-cell; text-align: right; white-space: nowrap; }
+
+  /* Items table */
+  .items-table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 13px; }
+  .items-table th {
+    background-color: #1F2937;
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .items-table th:first-child { border-radius: 6px 0 0 0; }
+  .items-table th:last-child { border-radius: 0 6px 0 0; }
+  .items-table th.r { text-align: right; }
+  .items-table td { padding: 10px 14px; border-bottom: 1px solid #E5E7EB; }
+  .items-table td.r { text-align: right; }
+  .items-table tr.even { background-color: #F9FAFB; }
+  .item-name { font-weight: 500; }
+  .item-sku { font-size: 11px; color: #9CA3AF; }
+
+  /* Totals */
+  .totals-wrap { text-align: right; margin-top: 16px; }
+  .totals-box { display: inline-block; width: 260px; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; text-align: left; }
+  .totals-row { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid #E5E7EB; }
+  .totals-row:last-child { border-bottom: none; }
+  .totals-row .label { color: #6B7280; }
+  .totals-row .value { font-weight: 600; color: #111827; float: right; }
+  .totals-row.total { background-color: #10B981; color: #fff; }
+  .totals-row.total .label, .totals-row.total .value { color: #fff; font-weight: 700; font-size: 15px; }
+
+  /* Notes */
+  .notes {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    background-color: #F9FAFB;
+  }
+  .notes-title { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; margin-bottom: 4px; }
+  .notes-content { font-size: 13px; color: #374151; white-space: pre-wrap; }
+
+  /* Footer */
+  .footer {
+    margin-top: 28px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+    font-size: 11px;
+    color: #9CA3AF;
+    display: table;
+    width: 100%;
+  }
+  .footer-left, .footer-right { display: table-cell; vertical-align: middle; }
+  .footer-right { text-align: right; }
+  .footer a { color: #10B981; font-weight: 700; text-decoration: none; }
+
+  /* Clear floats */
+  .clearfix::after { content: ""; display: table; clear: both; }
+</style>

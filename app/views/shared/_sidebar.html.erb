@@ -35,6 +35,8 @@
         <%= sidebar_link_to "Proveedores", providers_path, icon: "truck" %>
         <%= sidebar_link_to "Clientes", customers_path, icon: "users" %>
         <%= sidebar_link_to "Importaciones", bulk_imports_path, icon: "upload" %>
+        <%= sidebar_link_to "Cotizaciones", customer_quotes_path, icon: "file-text" %>
+        <%= sidebar_link_to "Ordenes de compra", purchase_orders_path, icon: "package" %>
       <% end %>
 
       <% if current_enterprise.present? && policy(User).index? %>
@@ -60,6 +62,10 @@
         <span class="theme-text-light hidden">Tema Claro</span>
       </span>
     </button>
+
+    <% if current_enterprise.present? && policy(current_enterprise).edit? %>
+      <%= sidebar_link_to "Mi Empresa", edit_enterprise_path(current_enterprise), icon: "building-2" %>
+    <% end %>
 
     <div class="sidebar-user">
       <div class="sidebar-user-avatar">

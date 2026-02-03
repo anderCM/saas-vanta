@@ -8,6 +8,7 @@ class Ubigeo < ApplicationRecord
   # Associations for related models
   has_many :providers, dependent: :restrict_with_error
   has_many :customers, dependent: :restrict_with_error
+  has_many :purchase_orders, foreign_key: :destination_id, dependent: :restrict_with_error
 
   # Validations
   validates :code, presence: true, uniqueness: true, length: { is: 6 }

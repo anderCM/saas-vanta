@@ -8,8 +8,41 @@ class CustomersController < ApplicationController
     @pagy, @customers = pagy(customers)
   end
 
+  def search
+    authorize Customer, :index?
+    query = params[:q].to_s.strip
+
+    @customers = if query.present?
+      current_enterprise.customers
+                       .where("LOWER(name) LIKE :query OR tax_id LIKE :query", query: "%#{query.downcase}%")
+                       .order(:name)
+                       .limit(20)
+    else
+      current_enterprise.customers.order(:name).limit(20)
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+      format.json do
+        render json: @customers.map { |c| { id: c.id, display: c.combobox_display, ubigeo_id: c.ubigeo_id } }
+      end
+    end
+  end
+
   def show
     authorize @customer
+
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: {
+          id: @customer.id,
+          name: @customer.name,
+          ubigeo_id: @customer.ubigeo_id,
+          ubigeo_display: @customer.ubigeo&.combobox_display
+        }
+      end
+    end
   end
 
   def new

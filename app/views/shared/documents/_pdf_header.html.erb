@@ -1,0 +1,25 @@
+<%# Shared PDF header for documents (purchase orders, quotes, etc.)
+     Required locals: enterprise, document_title, document_code, document_date %>
+
+<div class="header">
+  <div class="header-left">
+    <% if enterprise.logo.attached? %>
+      <img src="data:<%= enterprise.logo.content_type %>;base64,<%= Base64.strict_encode64(enterprise.logo.download) %>" class="logo" />
+    <% end %>
+    <span class="company"><%= enterprise.comercial_name %></span>
+  </div>
+  <div class="header-right">
+    <div class="title"><%= document_title %></div>
+    <div class="code"><%= document_code %></div>
+    <div class="date"><%= l(document_date, format: :long) %></div>
+  </div>
+</div>
+
+<div class="contact-bar">
+  <%= [
+    enterprise.address,
+    enterprise.phone_number,
+    enterprise.email,
+    enterprise.tax_id.present? ? "RUC: #{enterprise.tax_id}" : nil
+  ].compact.join("  |  ") %>
+</div>

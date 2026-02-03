@@ -1,0 +1,80 @@
+<div class="container mx-auto py-8 px-4">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Ordenes de Compra</h1>
+      <p class="mt-1 text-sm text-muted-foreground">Gestiona las ordenes de compra a proveedores</p>
+    </div>
+    <% if policy(PurchaseOrder).create? %>
+      <%= link_to new_purchase_order_path, class: "btn-primary" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Nueva Orden
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @purchase_orders.any? %>
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted/50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Codigo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Proveedor</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Fecha</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Creado por</th>
+              <th class="relative px-6 py-3"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <% @purchase_orders.each do |order| %>
+              <tr class="hover:bg-muted/30 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm font-medium text-foreground"><%= order.code %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm text-foreground"><%= order.provider.name %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm text-muted-foreground"><%= l(order.issue_date, format: :short) %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm font-medium text-foreground">S/ <%= number_with_precision(order.total, precision: 2, delimiter: ",") %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="<%= order.status_badge_class %>"><%= order.status_label %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm text-muted-foreground"><%= order.created_by.first_name %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <%= link_to "Ver", order, class: "text-primary hover:underline" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  <% else %>
+    <div class="card text-center py-12">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-foreground">No hay ordenes de compra</h3>
+      <p class="mt-2 text-sm text-muted-foreground">Comienza creando tu primera orden de compra.</p>
+      <% if policy(PurchaseOrder).create? %>
+        <div class="mt-6">
+          <%= link_to "Nueva Orden de Compra", new_purchase_order_path, class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

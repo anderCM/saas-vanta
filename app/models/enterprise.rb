@@ -8,6 +8,8 @@ class Enterprise < ApplicationRecord
   has_many :products, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :bulk_imports, dependent: :destroy
+  has_many :purchase_orders, dependent: :destroy
+  has_many :customer_quotes, dependent: :destroy
 
   # Callbacks
   before_validation :generate_subdomain, on: :create

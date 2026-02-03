@@ -8,7 +8,7 @@ class CreateProducts < ActiveRecord::Migration[8.1]
       t.string :sku
       t.string :source_type, null: false
       t.string :unit, null: false
-      t.integer :units_per_package
+      t.decimal :units_per_package
       t.decimal :buy_price, null: false
       t.decimal :sell_cash_price, null: false
       t.decimal :sell_credit_price, null: false

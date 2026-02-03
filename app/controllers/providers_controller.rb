@@ -8,6 +8,24 @@ class ProvidersController < ApplicationController
     @pagy, @providers = pagy(providers)
   end
 
+  def search
+    authorize Provider, :index?
+    query = params[:q].to_s.strip
+
+    @providers = if query.present?
+      current_enterprise.providers
+                       .where("LOWER(name) LIKE :query OR tax_id LIKE :query", query: "%#{query.downcase}%")
+                       .order(:name)
+                       .limit(20)
+    else
+      current_enterprise.providers.order(:name).limit(20)
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+    end
+  end
+
   def show
     authorize @provider
   end

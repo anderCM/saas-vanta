@@ -11,6 +11,6 @@ class CreateUbigeos < ActiveRecord::Migration[8.1]
 
     add_index :ubigeos, :code, unique: true
     add_index :ubigeos, :level
-    add_index :ubigeos, [:level, :parent_id]
+    add_index :ubigeos, [ :level, :parent_id ]
   end
 end

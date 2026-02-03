@@ -2,6 +2,7 @@ class Customer < ApplicationRecord
   # Associations
   belongs_to :enterprise
   belongs_to :ubigeo, optional: true
+  has_many :customer_quotes, dependent: :restrict_with_error
 
   # Validations
   validates :name, presence: true
@@ -13,10 +14,14 @@ class Customer < ApplicationRecord
 
   # Enums
   enum :tax_id_type, {
-    ruc: 'ruc',
-    dni: 'dni',
-    no_document: 'no_document'
+    ruc: "ruc",
+    dni: "dni",
+    no_document: "no_document"
   }
+
+  def combobox_display
+    tax_id.present? ? "#{name} (#{tax_id})" : name
+  end
 
   private
 
@@ -33,9 +38,9 @@ class Customer < ApplicationRecord
     end
 
     if ruc?
-      Peru::TaxIdValidator.new(attributes: [:tax_id]).validate_each(self, :tax_id, tax_id)
+      Peru::TaxIdValidator.new(attributes: [ :tax_id ]).validate_each(self, :tax_id, tax_id)
     elsif dni?
-      Peru::TaxIdDniValidator.new(attributes: [:tax_id]).validate_each(self, :tax_id, tax_id)
+      Peru::TaxIdDniValidator.new(attributes: [ :tax_id ]).validate_each(self, :tax_id, tax_id)
     end
   end
 end

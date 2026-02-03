@@ -67,4 +67,3 @@ class BulkImportJob < ApplicationJob
     )
   end
 end
-
