@@ -9,11 +9,8 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   # Remove any existing server.pid file to prevent "server already running" errors
   rm -f tmp/pids/server.pid
   
-  # Prepare the database (create, migrate, seed)
+  # Prepare all databases (primary + cache/queue/cable)
   ./bin/rails db:prepare
-  ./bin/rails db:create:cache 2>/dev/null; ./bin/rails db:schema:load:cache 2>/dev/null || true
-  ./bin/rails db:create:queue 2>/dev/null; ./bin/rails db:schema:load:queue 2>/dev/null || true
-  ./bin/rails db:create:cable 2>/dev/null; ./bin/rails db:schema:load:cable 2>/dev/null || true
   ./bin/rails db:seed
 fi
 
