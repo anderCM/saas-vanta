@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - development
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - development
 
 jobs:
   scan_ruby:
@@ -88,13 +92,13 @@ jobs:
       - name: Setup database
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/saas_vanta_test
+          DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/saas_vanta_test
         run: bin/rails db:test:prepare
 
       - name: Run RSpec
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/saas_vanta_test
+          DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/saas_vanta_test
         run: bundle exec rspec
 
   docker_build:

@@ -14,13 +14,15 @@ gem "importmap-rails"
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
+# Hotwire Combobox for autocomplete select inputs [https://github.com/josefarias/hotwire_combobox]
+gem "hotwire_combobox"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -41,6 +43,26 @@ gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
+
+# Use awesome_print for better debugging
+gem "awesome_print", "~> 1.9", ">= 1.9.2"
+
+# Pagination
+gem "pagy", "~> 9.3"
+
+# Excel handling
+gem "roo", "~> 2.10"           # Read Excel/CSV files
+gem "caxlsx", "~> 4.1"         # Generate Excel files
+gem "caxlsx_rails", "~> 0.6"   # Rails integration for caxlsx
+
+# Use data_migrate for database migrations
+gem "data_migrate", "~> 11.3", ">= 11.3.1"
+
+# S3-compatible storage (Cloudflare R2)
+gem "aws-sdk-s3", "~> 1.213", require: false
+
+# Mailer
+gem "resend", "~> 1.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -67,4 +89,12 @@ group :test do
   gem "selenium-webdriver"
 end
 
+# PDF generation from HTML
+gem "wicked_pdf", "~> 2.8"
+gem "wkhtmltopdf-binary", "~> 0.12"
+
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
+
+gem "shoulda-matchers", "~> 7.0", groups: [ :development, :test ]
+gem "factory_bot_rails", "~> 6.5", groups: [ :development, :test ]
+gem "faker", "~> 3.5", groups: [ :development, :test ]

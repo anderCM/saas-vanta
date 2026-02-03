@@ -1,0 +1,16 @@
+<% if @products.any? %>
+  <% @products.each do |product| %>
+    <button type="button"
+      class="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
+      data-action="click->customer-quote-form#selectProduct"
+      data-product-id="<%= product.id %>"
+      data-product-name="<%= product.combobox_display %>"
+      data-product-price="<%= product.sell_cash_price %>">
+      <%= product.combobox_display %>
+    </button>
+  <% end %>
+<% else %>
+  <div class="px-4 py-3 text-sm text-muted-foreground">
+    No se encontraron productos
+  </div>
+<% end %>

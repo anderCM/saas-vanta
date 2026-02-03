@@ -1,31 +1,165 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Saas Vanta" %></title>
+    <title><%= content_for(:title) || "VANTA SAAS" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Saas Vanta">
+    <meta name="application-name" content="VANTA SAAS">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <link rel="icon" href="/logo-vanta-fox.png" type="image/png">
+    <link rel="apple-touch-icon" href="/logo-vanta-fox.png">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Google Fonts - Inter %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= combobox_style_tag %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="antialiased">
+    <%# Theme initialization - default to light %>
+    <script>
+      (function() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+          document.body.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <% if authenticated? %>
+      <%# Authenticated Layout with Sidebar %>
+      <div data-controller="main-content" data-action="sidebar:collapsed->main-content#collapse sidebar:expanded->main-content#expand sidebar:mobileOpen->main-content#showOverlay sidebar:mobileClosed->main-content#hideOverlay">
+        <%# Mobile Overlay %>
+        <div class="sidebar-overlay" data-main-content-target="overlay" data-action="click->main-content#closeSidebar"></div>
+
+        <%= render "shared/sidebar" %>
+
+        <main class="main-with-sidebar" data-main-content-target="content">
+          <%# Dashboard Header %>
+          <header class="dashboard-header">
+            <div class="flex items-center gap-3">
+              <%# Mobile Menu Button %>
+              <button type="button" class="mobile-menu-btn" data-action="click->main-content#openSidebar" title="Abrir menú">
+                <%= sidebar_icon("menu", class: "w-6 h-6") %>
+              </button>
+              <h1 class="dashboard-header-title"><%= content_for(:page_title) || "Dashboard" %></h1>
+            </div>
+          </header>
+
+          <%# Main Content %>
+          <div class="dashboard-content">
+            <%# Flash Messages %>
+            <% flash.each do |key, value| %>
+              <div class="<%= key == 'notice' ? 'alert-success' : 'alert-error' %> mb-6" role="alert">
+                <span class="block sm:inline"><%= value %></span>
+              </div>
+            <% end %>
+
+            <%= yield %>
+          </div>
+        </main>
+      </div>
+    <% else %>
+      <%# Public Layout (Login, etc.) %>
+      <main class="min-h-screen bg-background">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <%# Flash Messages %>
+          <% flash.each do |key, value| %>
+            <div class="<%= key == 'notice' ? 'alert-success' : 'alert-error' %> mb-6" role="alert">
+              <span class="block sm:inline"><%= value %></span>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    <% end %>
+
+    <%# Theme toggle functionality %>
+    <script>
+      function initTheme() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+          document.body.classList.add('dark');
+        } else {
+          document.body.classList.remove('dark');
+        }
+        updateThemeUI();
+      }
+
+      function toggleTheme() {
+        const isDark = document.body.classList.contains('dark');
+        if (isDark) {
+          document.body.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.body.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        updateThemeUI();
+      }
+
+      function updateThemeUI() {
+        const isDark = document.body.classList.contains('dark');
+
+        // Toggle icons
+        document.querySelectorAll('.theme-icon-dark').forEach(el => {
+          el.classList.toggle('hidden', isDark);
+        });
+        document.querySelectorAll('.theme-icon-light').forEach(el => {
+          el.classList.toggle('hidden', !isDark);
+        });
+
+        // Toggle text
+        document.querySelectorAll('.theme-text-dark').forEach(el => {
+          el.classList.toggle('hidden', isDark);
+        });
+        document.querySelectorAll('.theme-text-light').forEach(el => {
+          el.classList.toggle('hidden', !isDark);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+      });
+
+      // Also run on turbo:load for Turbo Drive navigation
+      document.addEventListener('turbo:load', () => {
+        initTheme();
+        document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+      });
+
+      initTheme();
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Only apply collapsed state on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+          const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+          const mainContent = document.querySelector('.main-with-sidebar');
+          const sidebar = document.querySelector('.sidebar');
+          if (isCollapsed) {
+            if (mainContent) mainContent.classList.add('sidebar-is-collapsed');
+            if (sidebar) sidebar.classList.add('sidebar-collapsed');
+          }
+        }
+      });
+    </script>
+
+    <div data-controller="toast" data-toast-position-value="bottom-right" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
+      <div data-toast-target="container" class="flex flex-col gap-2"></div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,24 @@
+<div style="text-align: center; margin-bottom: 24px;">
+  <div style="display: inline-block; width: 64px; height: 64px; background-color: #FEF3C7; border-radius: 50%; line-height: 64px; font-size: 28px;">
+    &#128274;
+  </div>
+</div>
+
+<h2 style="text-align: center;">¿Olvidaste tu contraseña?</h2>
+
+<p class="text-muted" style="text-align: center;">
+  No te preocupes, esto le pasa a todo el mundo. Haz clic en el botón de abajo para restablecer tu contraseña.
+</p>
+
+<div class="button-container">
+  <%= link_to "Restablecer Contraseña", edit_password_url(@user.password_reset_token), class: "button" %>
+</div>
+
+<p class="text-muted text-small" style="text-align: center;">
+  Este enlace expirará en <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %> por seguridad.
+</p>
+
+<div class="alert-box warning">
+  <p class="alert-title">¿No solicitaste este cambio?</p>
+  <p class="alert-text">Si no solicitaste restablecer tu contraseña, puedes ignorar este correo. Tu cuenta sigue segura.</p>
+</div>

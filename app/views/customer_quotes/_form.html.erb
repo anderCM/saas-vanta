@@ -1,0 +1,242 @@
+<%= form_with model: customer_quote,
+              class: "space-y-8",
+              local: true,
+              data: {
+                controller: "customer-quote-form",
+                customer_quote_form_products_url_value: search_products_path,
+                customer_quote_form_prefill_url_value: prefill_customer_quotes_path
+              } do |f| %>
+
+  <% if customer_quote.errors.any? %>
+    <div class="alert-error">
+      <h3 class="text-sm font-medium">Se encontraron errores:</h3>
+      <div class="mt-2 text-sm">
+        <ul role="list" class="list-disc space-y-1 pl-5">
+          <% customer_quote.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <h3 class="text-lg font-medium leading-6 text-foreground">Informacion General</h3>
+    <p class="mt-1 text-sm text-muted-foreground">Datos principales de la cotizacion.</p>
+
+    <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+      <div class="sm:col-span-3">
+        <%= f.label :code, "Nro. de Cotizacion", class: "form-label" %>
+        <%= f.text_field :code, class: "form-input",
+            data: { customer_quote_form_target: "codeField" },
+            placeholder: "Se generara automaticamente" %>
+      </div>
+
+      <div class="sm:col-span-3">
+        <%= render "shared/async_combobox",
+            name: "customer_quote[customer_id]",
+            src: search_customers_path,
+            value: customer_quote.customer_id,
+            display: customer_quote.customer&.combobox_display,
+            label: "Cliente",
+            placeholder: "Buscar cliente...",
+            hint: "Selecciona el cliente para la cotizacion",
+            id: "customer_combobox",
+            size: "full" %>
+      </div>
+
+      <% if show_seller_selector %>
+        <div class="sm:col-span-3" data-customer-quote-form-target="sellerContainer">
+          <%= render "shared/async_combobox",
+              name: "customer_quote[seller_id]",
+              src: search_users_path,
+              value: customer_quote.seller_id,
+              display: customer_quote.seller&.combobox_display,
+              label: "Vendedor",
+              placeholder: "Buscar vendedor...",
+              hint: "Selecciona el vendedor asignado",
+              id: "seller_combobox",
+              size: "full" %>
+        </div>
+      <% else %>
+        <%= f.hidden_field :seller_id, value: customer_quote.seller_id %>
+      <% end %>
+
+      <div class="sm:col-span-3" data-customer-quote-form-target="destinationContainer"
+           data-customer-ubigeo-id="<%= customer_quote.customer&.ubigeo_id %>"
+           data-customer-ubigeo-display="<%= customer_quote.customer&.ubigeo&.combobox_display %>">
+        <%= render "shared/async_combobox",
+            name: "customer_quote[destination_id]",
+            src: ubigeos_path,
+            value: customer_quote.destination_id,
+            display: customer_quote.destination&.combobox_display,
+            label: "Destino",
+            optional: true,
+            placeholder: "Buscar ubicacion...",
+            hint: "Donde se entregara la mercaderia",
+            id: "destination_combobox",
+            size: "full" %>
+      </div>
+
+      <div class="sm:col-span-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <%= f.label :issue_date, "Fecha de Emision", class: "form-label" %>
+            <%= f.date_field :issue_date, class: "form-input", required: true %>
+          </div>
+
+          <div>
+            <%= f.label :expiration_date, class: "form-label" do %>
+              Fecha de Vencimiento <span class="text-muted-foreground font-normal">(opcional)</span>
+            <% end %>
+            <%= f.date_field :expiration_date, class: "form-input" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-foreground">Items</h3>
+        <p class="mt-1 text-sm text-muted-foreground">Productos a incluir en la cotizacion.</p>
+      </div>
+    </div>
+
+    <div id="items-container" data-customer-quote-form-target="itemsContainer">
+      <div class="overflow-x-auto">
+        <table class="min-w-[640px] w-full table-fixed divide-y divide-border">
+          <colgroup>
+            <col>
+            <col class="w-[110px]">
+            <col class="w-[140px]">
+            <col class="w-[110px]">
+            <col class="w-[48px]">
+          </colgroup>
+          <thead class="bg-muted/50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Producto</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Cantidad</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Precio Unit.</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Total</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody data-customer-quote-form-target="itemsList" class="divide-y divide-border">
+            <% if customer_quote.items.any? %>
+              <% customer_quote.items.each_with_index do |item, index| %>
+                <%= render "customer_quotes/item_fields", f: f, item: item, index: index %>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 p-4 border-2 border-dashed border-border rounded-lg" data-customer-quote-form-target="addItemSection">
+        <div class="flex items-end gap-4">
+          <div class="flex-1">
+            <label class="form-label">Agregar Producto</label>
+            <div class="relative" data-customer-quote-form-target="productSearchContainer">
+              <input type="text"
+                     placeholder="Buscar producto..."
+                     class="form-input"
+                     data-customer-quote-form-target="productSearch"
+                     data-action="input->customer-quote-form#searchProducts focus->customer-quote-form#showProductDropdown"
+                     autocomplete="off">
+              <div class="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"
+                   data-customer-quote-form-target="productDropdown">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="mt-6 border-t border-border pt-4">
+      <div class="flex justify-end">
+        <dl class="space-y-2 text-sm w-64">
+          <div class="flex justify-between">
+            <dt class="text-muted-foreground">Subtotal</dt>
+            <dd class="font-medium text-foreground">S/ <span data-customer-quote-form-target="subtotal">0.00</span></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-muted-foreground">IGV (<%= (::PeruTax::IGV_RATE * 100).to_i %>%)</dt>
+            <dd class="font-medium text-foreground">S/ <span data-customer-quote-form-target="tax">0.00</span></dd>
+          </div>
+          <div class="flex justify-between border-t border-border pt-2">
+            <dt class="font-semibold text-foreground">Total</dt>
+            <dd class="font-bold text-foreground text-lg">S/ <span data-customer-quote-form-target="total">0.00</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-lg font-medium leading-6 text-foreground">Notas</h3>
+    <div class="mt-4">
+      <%= f.text_area :notes,
+                      class: "form-input min-h-[100px]",
+                      placeholder: "Notas y condiciones para esta cotizacion..." %>
+      <p class="hidden mt-2 text-sm text-amber-600"
+         data-customer-quote-form-target="notesHint">
+        Se han precargado las notas de la ultima cotizacion para este cliente. Puedes editarlas libremente.
+      </p>
+    </div>
+  </div>
+
+  <!-- Template for new item row -->
+  <template data-customer-quote-form-target="itemTemplate">
+    <tr class="item-row" data-customer-quote-form-target="itemRow">
+      <td class="px-4 py-3">
+        <span class="product-name text-sm font-medium text-foreground"></span>
+        <input type="hidden" name="customer_quote[items_attributes][NEW_INDEX][product_id]" class="product-id-input">
+      </td>
+      <td class="px-4 py-3">
+        <input type="number"
+               name="customer_quote[items_attributes][NEW_INDEX][quantity]"
+               class="form-input w-full quantity-input"
+               min="1"
+               value="1"
+               data-action="input->customer-quote-form#calculateRowTotal">
+      </td>
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-1">
+          <input type="number"
+                 name="customer_quote[items_attributes][NEW_INDEX][unit_price]"
+                 class="form-input w-full unit-price-input"
+                 step="0.01"
+                 min="0"
+                 data-action="input->customer-quote-form#calculateRowTotal">
+          <div class="price-history-indicator hidden relative">
+            <button type="button" class="text-muted-foreground hover:text-foreground shrink-0" data-action="click->customer-quote-form#togglePriceHint">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+              </svg>
+            </button>
+            <span class="price-history-tooltip hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 text-xs font-medium text-primary-foreground bg-primary rounded-md shadow-lg whitespace-nowrap z-10">Precio de cotizacion anterior</span>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3">
+        <span class="row-total text-sm font-medium text-foreground">S/ 0.00</span>
+      </td>
+      <td class="px-4 py-3">
+        <button type="button"
+                class="text-destructive hover:text-destructive/80"
+                data-action="click->customer-quote-form#removeItem">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      </td>
+    </tr>
+  </template>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancelar", customer_quotes_path, class: "btn-secondary" %>
+    <%= f.submit customer_quote.persisted? ? "Actualizar Cotizacion" : "Crear Cotizacion", class: "btn-primary cursor-pointer" %>
+  </div>
+<% end %>

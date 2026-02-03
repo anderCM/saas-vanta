@@ -1,0 +1,175 @@
+<div class="max-w-4xl mx-auto py-8 px-4">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-foreground">Registrar Nueva Empresa</h1>
+    <p class="mt-1 text-sm text-muted-foreground">Complete los datos de la empresa y de los usuarios.</p>
+  </div>
+
+  <%= form_with model: [:admin, @enterprise], class: "space-y-8", local: true, data: { controller: "enterprise-form" } do |f| %>
+    <% if @enterprise.errors.any? %>
+      <div class="alert-error">
+        <h3 class="text-sm font-medium">Se encontraron errores:</h3>
+        <div class="mt-2 text-sm">
+          <ul role="list" class="list-disc space-y-1 pl-5">
+            <% @enterprise.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <h3 class="text-lg font-medium leading-6 text-foreground">Datos de la Empresa</h3>
+      <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+
+        <div class="sm:col-span-3">
+          <%= f.label :enterprise_type, "Tipo de Empresa", class: "form-label" %>
+          <%= f.select :enterprise_type, Enterprise.enterprise_types.keys.map { |k| [k.humanize, k] }, {}, class: "form-input", data: { enterprise_form_target: "typeSelect", action: "change->enterprise-form#toggle" } %>
+        </div>
+
+        <div class="sm:col-span-3 hidden" data-enterprise-form-target="taxIdContainer">
+          <%= f.label :tax_id, "RUC", class: "form-label" %>
+          <%= f.text_field :tax_id, class: "form-input", data: { enterprise_form_target: "taxIdInput" } %>
+        </div>
+
+        <div class="sm:col-span-6" id="social_reason_container">
+          <%= f.label :social_reason, "Razón Social", class: "form-label" %>
+          <%= f.text_field :social_reason, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :comercial_name, "Nombre Comercial", class: "form-label" %>
+          <%= f.text_field :comercial_name, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :address, "Dirección", class: "form-label" %>
+          <%= f.text_field :address, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.label :email, "Email de la Empresa", class: "form-label" %>
+          <%= f.email_field :email, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.label :phone_number, "Teléfono", class: "form-label" %>
+          <%= f.text_field :phone_number, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :logo, "Logo", class: "form-label" %>
+          <div class="mt-1 flex items-center">
+            <%= f.file_field :logo, class: "block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:cursor-pointer" %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <%# First User - Super Admin (Required) %>
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-medium leading-6 text-foreground">Usuario Super Admin</h3>
+          <p class="mt-1 text-sm text-muted-foreground">Este usuario será el administrador principal de la empresa (requerido).</p>
+        </div>
+        <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-0.5 text-sm font-medium text-primary">Super Admin</span>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <input type="hidden" name="enterprise[users][][role_slug]" value="super_admin">
+
+        <div class="sm:col-span-3">
+          <label class="form-label">Nombre</label>
+          <input type="text" name="enterprise[users][][first_name]" class="form-input" required>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label class="form-label">Apellido Paterno</label>
+          <input type="text" name="enterprise[users][][first_last_name]" class="form-input" required>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label class="form-label">Apellido Materno</label>
+          <input type="text" name="enterprise[users][][second_last_name]" class="form-input" required>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label class="form-label">Email del Usuario</label>
+          <input type="email" name="enterprise[users][][user_email]" class="form-input" required>
+        </div>
+      </div>
+    </div>
+
+    <%# Additional Users Container %>
+    <div data-enterprise-form-target="usersContainer" class="space-y-6">
+      <%# Dynamic users will be added here %>
+    </div>
+
+    <%# Add User Button %>
+    <div class="flex justify-center">
+      <button type="button"
+              data-action="click->enterprise-form#addUser"
+              class="btn-secondary inline-flex items-center">
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+        </svg>
+        Agregar Usuario
+      </button>
+    </div>
+
+    <%# Template for new users %>
+    <template data-enterprise-form-target="userTemplate">
+      <div data-user-card class="card">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium leading-6 text-foreground"><span data-user-number>Usuario #2</span></h3>
+          <button type="button"
+                  data-action="click->enterprise-form#removeUser"
+                  class="inline-flex items-center rounded-lg border border-destructive/30 bg-transparent px-3 py-1.5 text-sm font-medium text-destructive hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-destructive transition-colors">
+            <svg class="-ml-0.5 mr-1.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Eliminar
+          </button>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <div class="sm:col-span-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="enterprise[users][][first_name]" class="form-input">
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="form-label">Apellido Paterno</label>
+            <input type="text" name="enterprise[users][][first_last_name]" class="form-input">
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="form-label">Apellido Materno</label>
+            <input type="text" name="enterprise[users][][second_last_name]" class="form-input">
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="form-label">Email del Usuario</label>
+            <input type="email" name="enterprise[users][][user_email]" class="form-input">
+          </div>
+
+          <div class="sm:col-span-6">
+            <label class="form-label">Rol</label>
+            <select name="enterprise[users][][role_slug]" class="form-input">
+              <option value="super_admin">Super Admin</option>
+              <option value="admin">Admin</option>
+              <option value="seller">Vendedor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div class="flex justify-end gap-3">
+      <%= link_to "Cancelar", root_path, class: "btn-secondary" %>
+      <%= f.submit "Registrar Empresa", class: "btn-primary cursor-pointer" %>
+    </div>
+  <% end %>
+</div>
