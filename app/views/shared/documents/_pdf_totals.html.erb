@@ -1,0 +1,19 @@
+<%# Shared PDF totals for documents
+     Required locals: subtotal, tax, total %>
+
+<div class="totals-wrap">
+  <div class="totals-box">
+    <div class="totals-row clearfix">
+      <span class="label">Subtotal</span>
+      <span class="value">S/ <%= number_with_precision(subtotal, precision: 2, delimiter: ",") %></span>
+    </div>
+    <div class="totals-row clearfix">
+      <span class="label">IGV (<%= (PeruTax::IGV_RATE * 100).to_i %>%)</span>
+      <span class="value">S/ <%= number_with_precision(tax, precision: 2, delimiter: ",") %></span>
+    </div>
+    <div class="totals-row total clearfix">
+      <span class="label">Total</span>
+      <span class="value">S/ <%= number_with_precision(total, precision: 2, delimiter: ",") %></span>
+    </div>
+  </div>
+</div>

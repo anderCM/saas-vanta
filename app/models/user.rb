@@ -8,6 +8,10 @@ class User < ApplicationRecord
   has_many :enterprises, through: :user_enterprises
   has_many :user_enterprise_roles, through: :user_enterprises
   has_many :roles, through: :user_enterprise_roles
+  has_many :bulk_imports, dependent: :nullify
+  has_many :created_purchase_orders, class_name: "PurchaseOrder", foreign_key: :created_by_id, dependent: :restrict_with_error
+  has_many :created_customer_quotes, class_name: "CustomerQuote", foreign_key: :created_by_id, dependent: :restrict_with_error
+  has_many :sold_customer_quotes, class_name: "CustomerQuote", foreign_key: :seller_id, dependent: :restrict_with_error
 
   # Validations
   validates :first_name, :first_last_name, :email_address, presence: true
@@ -83,6 +87,10 @@ class User < ApplicationRecord
   # @return [Boolean] true if user is pending invitation, false otherwise
   def invitation_pending?
     pending? && invitation_token.present? && !invitation_accepted?
+  end
+
+  def combobox_display
+    "#{first_name} #{first_last_name}"
   end
 
   # Get the user's role slugs for a specific enterprise

@@ -1,0 +1,70 @@
+<div class="max-w-4xl mx-auto py-8 px-4">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-foreground">Editar Empresa</h1>
+    <p class="mt-1 text-sm text-muted-foreground">Actualice los datos de su empresa.</p>
+  </div>
+
+  <%= form_with model: @enterprise, url: enterprise_path(@enterprise), method: :patch, class: "space-y-8", local: true do |f| %>
+    <% if @enterprise.errors.any? %>
+      <div class="alert-error">
+        <h3 class="text-sm font-medium">Se encontraron errores:</h3>
+        <div class="mt-2 text-sm">
+          <ul role="list" class="list-disc space-y-1 pl-5">
+            <% @enterprise.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <h3 class="text-lg font-medium leading-6 text-foreground">Datos de la Empresa</h3>
+      <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+
+        <div class="sm:col-span-6">
+          <%= f.label :comercial_name, "Nombre Comercial", class: "form-label" %>
+          <%= f.text_field :comercial_name, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :social_reason, "Razon Social", class: "form-label" %>
+          <%= f.text_field :social_reason, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :address, "Direccion", class: "form-label" %>
+          <%= f.text_field :address, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.label :email, "Email de la Empresa", class: "form-label" %>
+          <%= f.email_field :email, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.label :phone_number, "Telefono", class: "form-label" %>
+          <%= f.text_field :phone_number, class: "form-input" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= f.label :logo, "Logo", class: "form-label" %>
+          <% if @enterprise.logo.attached? %>
+            <div class="mt-2 mb-4">
+              <%= image_tag @enterprise.logo, class: "h-20 w-20 object-contain rounded-lg border border-border" %>
+            </div>
+          <% end %>
+          <div class="mt-1 flex items-center">
+            <%= f.file_field :logo, class: "block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:cursor-pointer" %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <%= link_to "Cancelar", root_path, class: "btn-secondary" %>
+      <%= f.submit "Guardar Cambios", class: "btn-primary cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

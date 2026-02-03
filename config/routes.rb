@@ -10,13 +10,68 @@ Rails.application.routes.draw do
     resource :dashboard, only: [ :show ]
   end
 
-  resources :enterprises, only: [ :index ] do
+  resources :enterprises, only: [ :index, :edit, :update ] do
     member do
       post :select
     end
   end
 
-  resources :products
+  resources :products do
+    collection do
+      get :search
+    end
+  end
+  resources :providers do
+    collection do
+      get :search
+    end
+    resources :products, only: [ :index ], controller: "provider_products"
+  end
+  resources :customers do
+    collection do
+      get :search
+    end
+  end
+  resources :ubigeos, only: [ :index ]
+
+  resources :customer_quotes do
+    collection do
+      get :prefill
+    end
+    member do
+      patch :accept
+      patch :reject
+      patch :expire
+      get :pdf
+    end
+  end
+
+  resources :purchase_orders do
+    collection do
+      get :prefill
+    end
+    member do
+      patch :confirm
+      patch :receive
+      patch :cancel
+      get :pdf
+    end
+  end
+
+  resources :bulk_imports, only: [ :index, :show, :new, :create ] do
+    collection do
+      get :template
+    end
+  end
+
+  resources :users, except: [ :destroy ] do
+    collection do
+      get :search
+    end
+    member do
+      patch :toggle_status
+    end
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

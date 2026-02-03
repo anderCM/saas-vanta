@@ -1,0 +1,50 @@
+<%
+  field_id = local_assigns.fetch(:id, name.to_s.gsub(/[\[\]]/, '_').gsub(/__+/, '_').chomp('_'))
+  field_value = local_assigns.fetch(:value, nil)
+  field_display = local_assigns.fetch(:display, nil)
+  placeholder_text = local_assigns.fetch(:placeholder, "Buscar...")
+  hint_text = local_assigns.fetch(:hint, nil)
+  delay_ms = local_assigns.fetch(:delay, 300)
+  is_optional = local_assigns.fetch(:optional, false)
+  label_text = local_assigns.fetch(:label, nil)
+
+  # Size options: s, m, l, xl, full (default)
+  size_option = local_assigns.fetch(:size, "full").to_s
+  size_class = case size_option
+    when "s" then "max-w-48"
+    when "m" then "max-w-64"
+    when "l" then "max-w-80"
+    when "xl" then "max-w-96"
+    else "w-full"
+  end
+
+  # Build preselected option using OpenStruct to mimic a model
+  preselected_options = if field_value.present? && field_display.present?
+    [OpenStruct.new(id: field_value, display: field_display)]
+  else
+    []
+  end
+%>
+
+<div class="async-combobox <%= size_class %>">
+  <% if label_text.present? %>
+    <label for="<%= field_id %>" class="form-label">
+      <%= label_text %>
+      <% if is_optional %>
+        <span class="text-muted-foreground font-normal">(opcional)</span>
+      <% end %>
+    </label>
+  <% end %>
+
+  <%= combobox_tag name,
+      src,
+      options: combobox_options(preselected_options, display: :display, value: :id),
+      value: field_value,
+      id: field_id,
+      placeholder: placeholder_text,
+      async: { delay: delay_ms } %>
+
+  <% if hint_text.present? %>
+    <p class="mt-1 text-xs text-muted-foreground"><%= hint_text %></p>
+  <% end %>
+</div>

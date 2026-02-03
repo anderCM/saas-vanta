@@ -1,0 +1,87 @@
+<% content_for :title, @customer_quote.code %>
+
+<% content_for :head do %>
+  <%= render "shared/documents/pdf_styles" %>
+<% end %>
+
+<% enterprise = @customer_quote.enterprise %>
+<% customer = @customer_quote.customer %>
+<% seller = @customer_quote.seller %>
+
+<div class="doc">
+  <%= render "shared/documents/pdf_header",
+    enterprise: enterprise,
+    document_title: "COTIZACION",
+    document_code: @customer_quote.code,
+    document_date: @customer_quote.issue_date %>
+
+  <table class="info-grid"><tr>
+    <td>
+      <div class="info-card">
+        <div class="info-card-title">Datos del Cliente</div>
+        <div class="info-row"><span class="label">Nombre</span><span class="value"><%= customer.name %></span></div>
+        <% if customer.tax_id.present? %>
+          <div class="info-row"><span class="label">RUC</span><span class="value"><%= customer.tax_id %></span></div>
+        <% end %>
+        <% if customer.address.present? %>
+          <div class="info-row"><span class="label">Direccion</span><span class="value"><%= customer.address %></span></div>
+        <% end %>
+        <% if customer.phone_number.present? %>
+          <div class="info-row"><span class="label">Telefono</span><span class="value"><%= customer.phone_number %></span></div>
+        <% end %>
+      </div>
+    </td>
+    <td class="spacer"></td>
+    <td>
+      <div class="info-card">
+        <div class="info-card-title">Vendedor</div>
+        <div class="info-row"><span class="label">Nombre</span><span class="value"><%= seller.combobox_display %></span></div>
+        <% if seller.phone_number.present? %>
+          <div class="info-row"><span class="label">Telefono</span><span class="value"><%= seller.phone_number %></span></div>
+        <% end %>
+        <% if @customer_quote.expiration_date.present? %>
+          <div class="info-row"><span class="label">Vence</span><span class="value"><%= l(@customer_quote.expiration_date, format: :long) %></span></div>
+        <% end %>
+        <% if @customer_quote.destination.present? %>
+          <div class="info-row"><span class="label">Destino</span><span class="value"><%= @customer_quote.destination.full_path %></span></div>
+        <% end %>
+      </div>
+    </td>
+  </tr></table>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width:40%">Descripcion</th>
+        <th class="r">Cant.</th>
+        <th class="r">Unidad</th>
+        <th class="r">P. Unit.</th>
+        <th class="r">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @customer_quote.items.includes(:product).each_with_index do |item, i| %>
+        <tr class="<%= i.even? ? 'even' : '' %>">
+          <td>
+            <div class="item-name"><%= item.product.name %></div>
+            <% if item.product.sku.present? %>
+              <div class="item-sku">SKU: <%= item.product.sku %></div>
+            <% end %>
+          </td>
+          <td class="r"><%= item.quantity %></td>
+          <td class="r"><%= item.unit_label %></td>
+          <td class="r">S/ <%= number_with_precision(item.unit_price, precision: 2, delimiter: ",") %></td>
+          <td class="r">S/ <%= number_with_precision(item.total, precision: 2, delimiter: ",") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= render "shared/documents/pdf_totals",
+    subtotal: @customer_quote.subtotal,
+    tax: @customer_quote.tax,
+    total: @customer_quote.total %>
+
+  <%= render "shared/documents/pdf_footer",
+    notes: @customer_quote.notes %>
+</div>

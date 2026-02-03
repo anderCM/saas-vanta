@@ -1,12 +1,19 @@
 class Provider < ApplicationRecord
   # Associations
   belongs_to :enterprise
+  belongs_to :ubigeo, optional: true
+  has_many :products, dependent: :nullify
+  has_many :purchase_orders, dependent: :restrict_with_error
 
   # Validations
   validates :name, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validate :validate_phone_number
   validate :validate_tax_id
+
+  def combobox_display
+    tax_id.present? ? "#{name} (#{tax_id})" : name
+  end
 
   private
 

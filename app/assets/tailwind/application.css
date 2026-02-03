@@ -202,6 +202,37 @@ body {
   @apply text-primary;
 }
 
+/* Badges */
+.badge-secondary {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-muted text-muted-foreground;
+}
+
+.badge-info {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-blue-100 text-blue-800;
+}
+
+.dark .badge-info {
+  @apply bg-blue-900/30 text-blue-300;
+}
+
+.badge-success {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-primary/10 text-primary;
+}
+
+.badge-destructive {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply bg-destructive/10 text-destructive;
+}
+
+/* Buttons - Success */
+.btn-success {
+  @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium transition-all;
+  @apply hover:bg-primary/90;
+}
+
 /* Links */
 .link-primary {
   @apply text-primary hover:text-primary/80 transition-colors;
@@ -924,4 +955,182 @@ body {
   max-width: 100%;
   margin-left: 0;
   margin-right: 0;
+}
+
+/* ============================================
+   HOTWIRE COMBOBOX - Dark Mode Support
+   Using high specificity to override inline styles
+   ============================================ */
+
+/* Combobox Wrapper - high specificity */
+[data-controller="hw-combobox"] .hw-combobox__main__wrapper,
+.hw-combobox .hw-combobox__main__wrapper,
+.hw-combobox__main__wrapper {
+  background-color: var(--input-background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  transition: all 0.2s !important;
+}
+
+[data-controller="hw-combobox"] .hw-combobox__main__wrapper:focus-within,
+.hw-combobox .hw-combobox__main__wrapper:focus-within,
+.hw-combobox__main__wrapper:focus-within {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Combobox Input */
+[data-controller="hw-combobox"] .hw-combobox__input,
+.hw-combobox .hw-combobox__input,
+input.hw-combobox__input,
+.hw-combobox__input[type="text"] {
+  background-color: transparent !important;
+  color: var(--foreground) !important;
+  border: none !important;
+}
+
+[data-controller="hw-combobox"] .hw-combobox__input::placeholder,
+.hw-combobox__input::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
+/* Combobox Listbox (Dropdown) */
+[data-controller="hw-combobox"] .hw-combobox__listbox,
+.hw-combobox .hw-combobox__listbox,
+ul.hw-combobox__listbox,
+.hw-combobox__listbox {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+/* Combobox Options */
+[data-controller="hw-combobox"] .hw-combobox__option,
+.hw-combobox .hw-combobox__option,
+li.hw-combobox__option,
+.hw-combobox__option {
+  color: var(--foreground) !important;
+  padding: 0.625rem 1rem !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
+}
+
+[data-controller="hw-combobox"] .hw-combobox__option:hover,
+[data-controller="hw-combobox"] .hw-combobox__option[aria-selected="true"],
+.hw-combobox__option:hover,
+.hw-combobox__option[aria-selected="true"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+[data-controller="hw-combobox"] .hw-combobox__option--selected,
+.hw-combobox__option--selected,
+.hw-combobox__option[data-selected="true"] {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* Combobox Handle (Arrow) */
+[data-controller="hw-combobox"] .hw-combobox__handle,
+.hw-combobox .hw-combobox__handle,
+.hw-combobox__handle {
+  color: var(--muted-foreground) !important;
+}
+
+/* Dark mode specific adjustments */
+.dark [data-controller="hw-combobox"] .hw-combobox__listbox,
+.dark .hw-combobox__listbox {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Mobile specific - ensure dark mode works on all viewports */
+@media (max-width: 768px) {
+  .hw-combobox__main__wrapper,
+  [data-controller="hw-combobox"] .hw-combobox__main__wrapper {
+    background-color: var(--input-background) !important;
+    border-color: var(--border) !important;
+  }
+
+  .hw-combobox__input,
+  [data-controller="hw-combobox"] .hw-combobox__input {
+    background-color: transparent !important;
+    color: var(--foreground) !important;
+  }
+
+  .hw-combobox__listbox,
+  [data-controller="hw-combobox"] .hw-combobox__listbox,
+  ul.hw-combobox__listbox {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .hw-combobox__option,
+  [data-controller="hw-combobox"] .hw-combobox__option,
+  li.hw-combobox__option {
+    background-color: transparent !important;
+    color: var(--foreground) !important;
+  }
+
+  .hw-combobox__option:hover,
+  .hw-combobox__option[aria-selected="true"],
+  [data-controller="hw-combobox"] .hw-combobox__option:hover,
+  [data-controller="hw-combobox"] .hw-combobox__option[aria-selected="true"] {
+    background-color: var(--accent) !important;
+    color: var(--accent-foreground) !important;
+  }
+
+  /* Dialog/modal mode on mobile */
+  .hw-combobox__dialog,
+  .hw-combobox__dialog__wrapper,
+  [data-controller="hw-combobox"] .hw-combobox__dialog {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .hw-combobox__dialog__input,
+  [data-controller="hw-combobox"] .hw-combobox__dialog__input {
+    background-color: var(--input-background) !important;
+    color: var(--foreground) !important;
+    border-color: var(--border) !important;
+  }
+
+  .hw-combobox__dialog__listbox,
+  [data-controller="hw-combobox"] .hw-combobox__dialog__listbox {
+    background-color: var(--card) !important;
+  }
+
+  .hw-combobox__dialog__option,
+  [data-controller="hw-combobox"] .hw-combobox__dialog__option {
+    background-color: transparent !important;
+    color: var(--foreground) !important;
+  }
+
+  .hw-combobox__dialog__option:hover,
+  .hw-combobox__dialog__option[aria-selected="true"] {
+    background-color: var(--accent) !important;
+    color: var(--accent-foreground) !important;
+  }
+}
+
+/* Hide the injected style tag visually (it shouldn't show anyway) */
+.hw-combobox__main__wrapper > style {
+  display: none !important;
+}
+
+/* Async Combobox Wrapper - ensure combobox fills container */
+.async-combobox {
+  display: flex;
+  flex-direction: column;
+}
+
+.async-combobox [data-controller="hw-combobox"],
+.async-combobox .hw-combobox {
+  width: 100% !important;
+}
+
+.async-combobox .hw-combobox__main__wrapper {
+  width: 100% !important;
 }

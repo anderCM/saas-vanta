@@ -14,6 +14,8 @@ gem "importmap-rails"
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
+# Hotwire Combobox for autocomplete select inputs [https://github.com/josefarias/hotwire_combobox]
+gem "hotwire_combobox"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -48,6 +50,11 @@ gem "awesome_print", "~> 1.9", ">= 1.9.2"
 # Pagination
 gem "pagy", "~> 9.3"
 
+# Excel handling
+gem "roo", "~> 2.10"           # Read Excel/CSV files
+gem "caxlsx", "~> 4.1"         # Generate Excel files
+gem "caxlsx_rails", "~> 0.6"   # Rails integration for caxlsx
+
 # Use data_migrate for database migrations
 gem "data_migrate", "~> 11.3", ">= 11.3.1"
 
@@ -78,6 +85,10 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# PDF generation from HTML
+gem "wicked_pdf", "~> 2.8"
+gem "wkhtmltopdf-binary", "~> 0.12"
 
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
 

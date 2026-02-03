@@ -1,0 +1,37 @@
+<tr class="item-row" data-purchase-order-form-target="itemRow">
+  <td class="px-4 py-3">
+    <span class="product-name text-sm font-medium text-foreground"><%= item.product.combobox_display %></span>
+    <%= f.hidden_field "items_attributes[#{index}][id]", value: item.id if item.persisted? %>
+    <%= f.hidden_field "items_attributes[#{index}][product_id]", value: item.product_id, class: "product-id-input" %>
+  </td>
+  <td class="px-4 py-3">
+    <%= f.number_field "items_attributes[#{index}][quantity]",
+                       value: item.quantity,
+                       class: "form-input w-full quantity-input",
+                       min: 1,
+                       data: { action: "input->purchase-order-form#calculateRowTotal" } %>
+  </td>
+  <td class="px-4 py-3">
+    <%= f.number_field "items_attributes[#{index}][unit_price]",
+                       value: item.unit_price,
+                       class: "form-input w-full unit-price-input",
+                       step: "0.01",
+                       min: 0,
+                       data: { action: "input->purchase-order-form#calculateRowTotal" } %>
+  </td>
+  <td class="px-4 py-3">
+    <span class="row-total text-sm font-medium text-foreground">S/ <%= number_with_precision(item.total || 0, precision: 2) %></span>
+  </td>
+  <td class="px-4 py-3">
+    <% if item.persisted? %>
+      <%= f.hidden_field "items_attributes[#{index}][_destroy]", value: "0", class: "destroy-input" %>
+    <% end %>
+    <button type="button"
+            class="text-destructive hover:text-destructive/80"
+            data-action="click->purchase-order-form#removeItem">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    </button>
+  </td>
+</tr>

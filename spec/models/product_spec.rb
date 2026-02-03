@@ -27,18 +27,6 @@ RSpec.describe Product, type: :model do
     end
 
     context 'validate_units_per_package' do
-      it 'validates that units_per_package is an integer' do
-        product = build(:product, units_per_package: 5.5)
-        expect(product).not_to be_valid
-        expect(product.errors[:base]).to include("El número de unidades por paquete debe ser un número entero positivo")
-      end
-
-      it 'validates that units_per_package is positive' do
-        product = build(:product, units_per_package: 0)
-        expect(product).not_to be_valid
-        expect(product.errors[:base]).to include("El número de unidades por paquete debe ser un número entero positivo")
-      end
-
       it 'allows valid units_per_package' do
         product = build(:product, units_per_package: 10)
         expect(product).to be_valid

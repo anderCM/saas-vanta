@@ -62,7 +62,7 @@
 
       <div class="sm:col-span-2">
         <%= f.label :units_per_package, "Unidades por Paquete", class: "form-label" %>
-        <%= f.number_field :units_per_package, class: "form-input", min: 1, placeholder: "Opcional" %>
+        <%= f.number_field :units_per_package, class: "form-input", min: 1, step: 0.1, placeholder: "Opcional" %>
       </div>
 
       <div class="sm:col-span-3" data-product-form-target="providerContainer">

@@ -1,0 +1,68 @@
+<%= form_with model: user, class: "space-y-6" do |form| %>
+  <% if user.errors.any? %>
+    <div class="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
+      <h3 class="font-medium"><%= pluralize(user.errors.count, "error") %> impidieron guardar el usuario:</h3>
+      <ul class="mt-2 list-disc list-inside text-sm">
+        <% user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <h3 class="text-lg font-medium text-foreground mb-4">Información Personal</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-group">
+        <%= form.label :first_name, "Nombre", class: "form-label" %>
+        <%= form.text_field :first_name, class: "form-input", required: true, placeholder: "Ej: Juan" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :first_last_name, "Apellido Paterno", class: "form-label" %>
+        <%= form.text_field :first_last_name, class: "form-input", required: true, placeholder: "Ej: Pérez" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :second_last_name, "Apellido Materno", class: "form-label" %>
+        <%= form.text_field :second_last_name, class: "form-input", placeholder: "Ej: García (opcional)" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :phone_number, "Teléfono", class: "form-label" %>
+        <%= form.text_field :phone_number, class: "form-input", placeholder: "Ej: 999888777" %>
+      </div>
+
+      <% if user.new_record? %>
+        <div class="form-group md:col-span-2">
+          <%= form.label :email_address, "Email", class: "form-label" %>
+          <%= form.email_field :email_address, class: "form-input", required: true, placeholder: "Ej: juan.perez@empresa.com" %>
+          <p class="text-xs text-muted-foreground mt-1">Se enviará una invitación a este correo electrónico</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-lg font-medium text-foreground mb-4">Rol en la Empresa</h3>
+
+    <div class="form-group">
+      <%= label_tag :role_id, "Rol", class: "form-label" %>
+      <%= select_tag :role_id,
+          options_from_collection_for_select(@roles, :id, :name, local_assigns[:current_role_id]),
+          class: "form-input",
+          include_blank: "Seleccionar rol...",
+          required: true %>
+      <p class="text-xs text-muted-foreground mt-1">
+        <strong>Admin:</strong> Acceso completo a la empresa |
+        <strong>Vendedor:</strong> Acceso limitado a ventas
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancelar", users_path, class: "btn-secondary" %>
+    <%= form.submit user.new_record? ? "Crear Usuario" : "Guardar Cambios", class: "btn-primary" %>
+  </div>
+<% end %>
