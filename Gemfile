@@ -58,11 +58,11 @@ gem "caxlsx_rails", "~> 0.6"   # Rails integration for caxlsx
 # Use data_migrate for database migrations
 gem "data_migrate", "~> 11.3", ">= 11.3.1"
 
-# For multimedia storage
-gem "cloudinary", "~> 2.4", ">= 2.4.3"
+# S3-compatible storage (Cloudflare R2)
+gem "aws-sdk-s3", "~> 1.213", require: false
 
 # Mailer
-gem 'resend', '~> 1.0'
+gem "resend", "~> 1.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
