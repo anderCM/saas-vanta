@@ -11,6 +11,9 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   
   # Prepare the database (create, migrate, seed)
   ./bin/rails db:prepare
+  ./bin/rails db:prepare:cache
+  ./bin/rails db:prepare:queue
+  ./bin/rails db:prepare:cable
   ./bin/rails db:seed
 fi
 
