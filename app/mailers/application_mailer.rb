@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "Vanta <no-reply@mail.vanta.lat>"
   layout "mailer"
 end

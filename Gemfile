@@ -61,6 +61,9 @@ gem "data_migrate", "~> 11.3", ">= 11.3.1"
 # For multimedia storage
 gem "cloudinary", "~> 2.4", ">= 2.4.3"
 
+# Mailer
+gem 'resend', '~> 1.0'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
