@@ -6,13 +6,13 @@ RSpec.describe Product, type: :model do
       it 'validates that stock is an integer' do
         product = build(:product, stock: 10.5)
         expect(product).not_to be_valid
-        expect(product.errors[:base]).to include("El stock debe ser un número entero positivo")
+        expect(product.errors[:base]).to include("El stock debe ser un número entero no negativo")
       end
 
-      it 'validates that stock is positive' do
+      it 'validates that stock is not negative' do
         product = build(:product, stock: -1)
         expect(product).not_to be_valid
-        expect(product.errors[:base]).to include("El stock debe ser un número entero positivo")
+        expect(product.errors[:base]).to include("El stock debe ser un número entero no negativo")
       end
 
       it 'allows valid stock' do

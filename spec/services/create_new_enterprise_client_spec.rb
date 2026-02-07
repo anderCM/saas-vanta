@@ -10,17 +10,17 @@ RSpec.describe CreateNewEnterpriseClient do
   let(:valid_enterprise_params) do
     ActionController::Parameters.new({
       enterprise_type: 'informal',
-      comercial_name: 'Test Company',
-      social_reason: 'Test Company SAC',
-      address: '123 Test Street',
-      email: 'company@test.com',
-      phone_number: '999888777',
+      comercial_name: Faker::Company.name,
+      social_reason: Faker::Company.name,
+      address: Faker::Address.street_address,
+      email: Faker::Internet.email,
+      phone_number: '999999999',
       users: [
         {
-          user_email: 'admin@newcompany.com',
-          first_name: 'John',
-          first_last_name: 'Doe',
-          second_last_name: 'Smith',
+          user_email: Faker::Internet.email,
+          first_name: Faker::Name.first_name,
+          first_last_name: Faker::Name.last_name,
+          second_last_name: Faker::Name.last_name,
           role_slug: 'super_admin'
         }
       ]
@@ -47,9 +47,9 @@ RSpec.describe CreateNewEnterpriseClient do
       it 'creates enterprise with correct attributes' do
         service.call
         enterprise = Enterprise.last
-        expect(enterprise.comercial_name).to eq('Test Company')
-        expect(enterprise.social_reason).to eq('Test Company SAC')
-        expect(enterprise.email).to eq('company@test.com')
+        expect(enterprise.comercial_name).to eq(valid_enterprise_params[:comercial_name])
+        expect(enterprise.social_reason).to eq(valid_enterprise_params[:social_reason])
+        expect(enterprise.email).to eq(valid_enterprise_params[:email])
       end
 
       it 'creates a new user for the enterprise' do
@@ -168,7 +168,7 @@ RSpec.describe CreateNewEnterpriseClient do
       let(:invalid_user_params) do
         ActionController::Parameters.new({
           enterprise_type: 'informal',
-          comercial_name: 'Test Company',
+          comercial_name: "Invalid Role Corp #{SecureRandom.hex(4)}",
           users: [
             {
               user_email: 'valid@company.com',
@@ -206,7 +206,7 @@ RSpec.describe CreateNewEnterpriseClient do
 
       it 'adds error message with user details' do
         invalid_user_service.call
-        expect(invalid_user_service.errors_message).to include('valid@company.com')
+        expect(invalid_user_service.errors_message).to include(invalid_user_params[:users][0][:user_email])
       end
     end
 

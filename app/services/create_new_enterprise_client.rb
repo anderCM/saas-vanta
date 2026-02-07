@@ -55,7 +55,8 @@ class CreateNewEnterpriseClient < BaseService
   end
 
   def enterprise_params
-    @params.permit(:tax_id, :enterprise_type, :social_reason, :comercial_name, :address, :email, :phone_number, :logo)
+    @params.permit(:tax_id, :enterprise_type, :social_reason, :comercial_name, :address, :email, :phone_number, :logo,
+                   settings_attributes: [ :use_stock, :dropshipping_enabled ])
   end
 
   def user_params

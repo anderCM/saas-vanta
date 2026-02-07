@@ -1,20 +1,12 @@
 class PurchaseOrder < ApplicationRecord
-  # Associations
-  belongs_to :enterprise
+  include Documentable
+
   belongs_to :provider
-  belongs_to :created_by, class_name: "User"
-  belongs_to :destination, class_name: "Ubigeo", optional: true
-  belongs_to :customer, optional: true
+  belongs_to :sourceable, polymorphic: true, optional: true
 
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   accepts_nested_attributes_for :items, allow_destroy: true, reject_if: :all_blank
 
-  # Validations
-  validates :code, presence: true, uniqueness: { scope: :enterprise_id }
-  validates :issue_date, presence: true
-  validates :status, presence: true
-
-  # Enums
   enum :status, {
     draft: "draft",
     confirmed: "confirmed",
@@ -22,8 +14,15 @@ class PurchaseOrder < ApplicationRecord
     cancelled: "cancelled"
   }
 
-  # Callbacks
-  before_save :calculate_totals
+  def self.generate_next_code(enterprise)
+    current_year = Date.current.year
+    last_record = enterprise.purchase_orders
+      .where("code LIKE ?", "OC-%-#{current_year}")
+      .order(created_at: :desc)
+      .first
+    last_number = last_record&.code&.split("-")&.second.to_i || 0
+    "OC-#{(last_number + 1).to_s.rjust(4, '0')}-#{current_year}"
+  end
 
   # Instance methods
   def can_edit?
@@ -53,7 +52,7 @@ class PurchaseOrder < ApplicationRecord
 
     transaction do
       update!(status: :received)
-      update_product_stock!
+      update_product_stock! if enterprise.use_stock?
     end
   end
 
@@ -83,12 +82,6 @@ class PurchaseOrder < ApplicationRecord
   end
 
   private
-
-  def calculate_totals
-    self.total = items.sum { |item| item.total || 0 }
-    self.subtotal = PeruTax.base_amount(total)
-    self.tax = PeruTax.extract_igv(total)
-  end
 
   def update_product_stock!
     items.includes(:product).find_each do |item|

@@ -1,20 +1,13 @@
 class CustomerQuote < ApplicationRecord
-  # Associations
-  belongs_to :enterprise
+  include Documentable
+
   belongs_to :customer
-  belongs_to :created_by, class_name: "User"
   belongs_to :seller, class_name: "User"
-  belongs_to :destination, class_name: "Ubigeo", optional: true
 
   has_many :items, class_name: "CustomerQuoteItem", dependent: :destroy
+  has_many :sales, as: :sourceable
   accepts_nested_attributes_for :items, allow_destroy: true, reject_if: :all_blank
 
-  # Validations
-  validates :code, presence: true, uniqueness: { scope: :enterprise_id }
-  validates :issue_date, presence: true
-  validates :status, presence: true
-
-  # Enums
   enum :status, {
     pending: "pending",
     accepted: "accepted",
@@ -22,8 +15,15 @@ class CustomerQuote < ApplicationRecord
     expired: "expired"
   }
 
-  # Callbacks
-  before_save :calculate_totals
+  def self.generate_next_code(enterprise)
+    current_year = Date.current.year
+    last_record = enterprise.customer_quotes
+      .where("code LIKE ?", "COT-%-#{current_year}")
+      .order(created_at: :desc)
+      .first
+    last_number = last_record&.code&.split("-")&.second.to_i || 0
+    "COT-#{(last_number + 1).to_s.rjust(4, '0')}-#{current_year}"
+  end
 
   # Instance methods
   def can_edit?
@@ -45,7 +45,10 @@ class CustomerQuote < ApplicationRecord
   def accept!
     return false unless can_accept?
 
-    update!(status: :accepted)
+    transaction do
+      update!(status: :accepted)
+      create_sale_from_quote!
+    end
   end
 
   def reject!
@@ -81,9 +84,27 @@ class CustomerQuote < ApplicationRecord
 
   private
 
-  def calculate_totals
-    self.total = items.sum { |item| item.total || 0 }
-    self.subtotal = PeruTax.base_amount(total)
-    self.tax = PeruTax.extract_igv(total)
+  def create_sale_from_quote!
+    sale = enterprise.sales.create!(
+      code: Sale.generate_next_code(enterprise),
+      customer: customer,
+      seller: seller,
+      created_by: created_by,
+      destination: destination,
+      issue_date: Date.current,
+      status: :pending,
+      notes: notes,
+      sourceable: self
+    )
+
+    items.each do |item|
+      sale.items.create!(
+        product: item.product,
+        quantity: item.quantity,
+        unit_price: item.unit_price
+      )
+    end
+
+    sale.save!
   end
 end

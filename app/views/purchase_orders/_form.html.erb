@@ -44,22 +44,7 @@
             size: "full" %>
       </div>
 
-      <div class="sm:col-span-3" data-purchase-order-form-target="customerContainer">
-        <%= render "shared/async_combobox",
-            name: "purchase_order[customer_id]",
-            src: search_customers_path,
-            value: purchase_order&.customer_id,
-            display: purchase_order.customer&.combobox_display,
-            label: "Cliente",
-            placeholder: "Buscar cliente...",
-            hint: "Selecciona el cliente para la orden",
-            id: "customer_combobox",
-            size: "full" %>
-      </div>
-
-      <div class="sm:col-span-3" data-purchase-order-form-target="destinationContainer"
-           data-customer-ubigeo-id="<%= purchase_order.customer&.ubigeo_id %>"
-           data-customer-ubigeo-display="<%= purchase_order.customer&.ubigeo&.combobox_display %>">
+      <div class="sm:col-span-3" data-purchase-order-form-target="destinationContainer">
         <%= render "shared/async_combobox",
             name: "purchase_order[destination_id]",
             src: ubigeos_path,
@@ -72,6 +57,16 @@
             id: "destination_combobox",
             size: "full" %>
       </div>
+
+      <% if purchase_order.sourceable.is_a?(Sale) || purchase_order.delivery_address.present? %>
+        <div class="sm:col-span-6">
+          <%= f.label :delivery_address, class: "form-label" do %>
+            Direccion de Entrega <span class="text-muted-foreground font-normal">(dropshipping)</span>
+          <% end %>
+          <%= f.text_field :delivery_address, class: "form-input",
+              placeholder: "Direccion donde se entregara la mercaderia al cliente" %>
+        </div>
+      <% end %>
 
       <div class="sm:col-span-3">
         <div class="grid grid-cols-2 gap-3">

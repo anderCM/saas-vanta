@@ -4,6 +4,7 @@ class Product < ApplicationRecord
   belongs_to :provider, optional: true
   has_many :purchase_order_items, dependent: :restrict_with_error
   has_many :customer_quote_items, dependent: :restrict_with_error
+  has_many :sale_items, dependent: :restrict_with_error
 
   # Normalizations
   normalizes :sku, with: ->(value) { value.strip.presence }
@@ -47,7 +48,7 @@ class Product < ApplicationRecord
 
   def validate_stock
     return unless stock.present?
-    errors_msg = "El stock debe ser un número entero positivo"
+    errors_msg = "El stock debe ser un número entero no negativo"
 
     raw_value = stock_before_type_cast
     unless raw_value.is_a?(Integer) || (raw_value.is_a?(String) && raw_value.match?(/\A\d+\z/))
@@ -55,7 +56,7 @@ class Product < ApplicationRecord
       return
     end
 
-    unless stock.positive?
+    if stock.negative?
       errors.add(:base, errors_msg)
     end
   end
