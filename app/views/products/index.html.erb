@@ -29,7 +29,9 @@
               <th class="table-th text-left">Origen</th>
               <th class="table-th text-right">P. Compra</th>
               <th class="table-th text-right">P. Venta</th>
-              <th class="table-th text-center">Stock</th>
+              <% if current_enterprise.use_stock? %>
+                <th class="table-th text-center">Stock</th>
+              <% end %>
               <th class="table-th text-center">Estado</th>
               <th class="table-th"><span class="sr-only">Acciones</span></th>
             </tr>
@@ -42,7 +44,9 @@
                 <%= table_cell(source_type_label(product.source_type)) %>
                 <%= table_cell(product.buy_price, type: :currency, align: :right, class: "text-muted-foreground") %>
                 <%= table_cell(product.sell_cash_price, type: :currency, align: :right, class: "font-medium text-foreground") %>
-                <%= table_cell_stock(product.stock, product.unit) %>
+                <% if current_enterprise.use_stock? %>
+                  <%= table_cell_stock(product.stock, product.unit) %>
+                <% end %>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                   <%= render_status_badge(product.status) %>
                 </td>

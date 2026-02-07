@@ -42,8 +42,10 @@ class Sale < ApplicationRecord
 
     transaction do
       update!(status: :confirmed)
-      update_product_stock!
+      update_product_stock! if enterprise.use_stock?
     end
+
+    true
   end
 
   def cancel!
@@ -68,12 +70,20 @@ class Sale < ApplicationRecord
   def generate_purchase_orders!(created_by:)
     return false unless can_generate_purchase_orders?
 
+    items_without_provider = items.includes(product: :provider).select { |item| item.product.provider.nil? }
+    if items_without_provider.any?
+      names = items_without_provider.map { |i| i.product.name }.join(", ")
+      errors.add(:base, "Los siguientes productos no tienen proveedor asignado: #{names}")
+      return false
+    end
+
     items_by_provider = items.includes(product: :provider).group_by { |item| item.product.provider }
+    historical_data_recoverer = PurchaseOrders::HistoricalDataRecoverer.new(enterprise: enterprise, customer_id: customer.id)
+    historical_data_recoverer.call
+    last_order_data = historical_data_recoverer.last_order_data
 
     transaction do
       items_by_provider.each do |provider, sale_items|
-        next if provider.nil?
-
         po = enterprise.purchase_orders.create!(
           code: PurchaseOrder.generate_next_code(enterprise),
           provider: provider,
@@ -82,7 +92,7 @@ class Sale < ApplicationRecord
           issue_date: Date.current,
           status: :draft,
           created_by: created_by,
-          notes: "OC generada desde venta #{code} - Cliente: #{customer.name}"
+          notes: last_order_data[:last_notes]
         )
 
         sale_items.each do |item|
@@ -96,6 +106,8 @@ class Sale < ApplicationRecord
         po.save!
       end
     end
+
+    true
   end
 
   private
@@ -105,7 +117,7 @@ class Sale < ApplicationRecord
       product = item.product
       current_stock = product.stock || 0
       new_stock = current_stock - item.quantity
-      product.update!(stock: [new_stock, 0].max)
+      product.update!(stock: [ new_stock, 0 ].max)
     end
   end
 end

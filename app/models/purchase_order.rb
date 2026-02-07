@@ -52,7 +52,7 @@ class PurchaseOrder < ApplicationRecord
 
     transaction do
       update!(status: :received)
-      update_product_stock!
+      update_product_stock! if enterprise.use_stock?
     end
   end
 

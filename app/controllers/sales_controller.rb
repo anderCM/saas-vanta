@@ -99,8 +99,10 @@ class SalesController < ApplicationController
     if @sale.confirm!
       redirect_to @sale, notice: "Venta confirmada. Stock actualizado."
     else
-      redirect_to @sale, alert: "No se pudo confirmar la venta."
+      redirect_to @sale, alert: @sale.errors.full_messages.join(", ")
     end
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @sale, alert: e.message
   end
 
   def cancel
@@ -119,8 +121,10 @@ class SalesController < ApplicationController
     if @sale.generate_purchase_orders!(created_by: Current.user)
       redirect_to @sale, notice: "Ordenes de compra generadas exitosamente."
     else
-      redirect_to @sale, alert: "No se pudieron generar las ordenes de compra."
+      redirect_to @sale, alert: @sale.errors.full_messages.first || "No se pudieron generar las ordenes de compra."
     end
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @sale, alert: e.message
   end
 
   def pdf

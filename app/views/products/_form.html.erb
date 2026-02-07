@@ -126,20 +126,22 @@
     </div>
   </div>
 
-  <%# Inventario %>
-  <div class="card">
-    <h3 class="text-lg font-medium leading-6 text-foreground">Inventario</h3>
-    <p class="mt-1 text-sm text-muted-foreground">Opcional - Configura el stock inicial del producto.</p>
+  <% if current_enterprise.use_stock? %>
+    <%# Inventario %>
+    <div class="card">
+      <h3 class="text-lg font-medium leading-6 text-foreground">Inventario</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Opcional - Configura el stock inicial del producto.</p>
 
-    <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+      <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
 
-      <div class="sm:col-span-2">
-        <%= f.label :stock, "Stock Actual", class: "form-label" %>
-        <%= f.number_field :stock, class: "form-input", min: 0, placeholder: "0" %>
+        <div class="sm:col-span-2">
+          <%= f.label :stock, "Stock Actual", class: "form-label" %>
+          <%= f.number_field :stock, class: "form-input", min: 0, placeholder: "0" %>
+        </div>
+
       </div>
-
     </div>
-  </div>
+  <% end %>
 
   <%# Acciones %>
   <div class="flex justify-end gap-3">

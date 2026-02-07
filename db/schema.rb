@@ -125,6 +125,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_000005) do
     t.boolean "dropshipping_enabled", default: false, null: false
     t.bigint "enterprise_id", null: false
     t.datetime "updated_at", null: false
+    t.boolean "use_stock", default: true
     t.index ["enterprise_id"], name: "index_enterprise_settings_on_enterprise_id", unique: true
   end
 

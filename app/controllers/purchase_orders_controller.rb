@@ -85,7 +85,7 @@ class PurchaseOrdersController < ApplicationController
     if @purchase_order.confirm!
       redirect_to @purchase_order, notice: "Orden de compra confirmada."
     else
-      redirect_to @purchase_order, alert: "No se pudo confirmar la orden."
+      redirect_to @purchase_order, alert: @purchase_order.errors.full_messages.join(", ")
     end
   end
 
@@ -97,6 +97,8 @@ class PurchaseOrdersController < ApplicationController
     else
       redirect_to @purchase_order, alert: "No se pudo marcar como recibida."
     end
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @purchase_order, alert: e.message
   end
 
   def cancel

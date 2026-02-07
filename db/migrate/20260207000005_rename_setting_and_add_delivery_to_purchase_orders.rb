@@ -4,5 +4,6 @@ class RenameSettingAndAddDeliveryToPurchaseOrders < ActiveRecord::Migration[8.0]
 
     add_reference :purchase_orders, :sourceable, polymorphic: true, null: true
     add_column :purchase_orders, :delivery_address, :string
+    add_column :enterprise_settings, :use_stock, :boolean, default: true
   end
 end

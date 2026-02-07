@@ -35,6 +35,10 @@ class Enterprise < ApplicationRecord
       formal: "formal"
   }
 
+  def use_stock?
+    settings&.use_stock != false
+  end
+
   private
 
   def set_enterprise_type

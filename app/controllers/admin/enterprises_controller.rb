@@ -23,6 +23,6 @@ class Admin::EnterprisesController < Admin::ApplicationController
 
   def enterprise_params
     params.require(:enterprise).permit(:tax_id, :enterprise_type, :social_reason, :comercial_name, :address, :email, :phone_number, :logo,
-                                       settings_attributes: [ :dropshipping_enabled ])
+                                       settings_attributes: [ :use_stock, :dropshipping_enabled ])
   end
 end
