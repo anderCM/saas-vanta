@@ -24,7 +24,8 @@ class PurchaseOrders::HistoricalDataRecoverer < BaseService
   def last_order
     @last_order ||= @enterprise
       .purchase_orders
-      .where(customer_id: @customer_id)
+      .where(sourceable_type: "Sale")
+      .where(sourceable_id: Sale.where(customer_id: @customer_id).select(:id))
       .where.not(status: :cancelled)
       .order(created_at: :desc)
       .first

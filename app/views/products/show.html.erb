@@ -82,14 +82,16 @@
     </div>
 
     <div class="space-y-6">
-      <div class="card">
-        <h3 class="text-lg font-medium text-foreground mb-4">Inventario</h3>
-        <div class="text-center p-4 bg-muted/30 rounded-lg">
-          <span class="text-3xl font-bold text-foreground"><%= @product.stock.presence || 0 %></span>
-          <span class="text-lg text-muted-foreground ml-1"><%= @product.unit %></span>
-          <p class="text-sm text-muted-foreground mt-1">en stock</p>
+      <% if current_enterprise.use_stock? %>
+        <div class="card">
+          <h3 class="text-lg font-medium text-foreground mb-4">Inventario</h3>
+          <div class="text-center p-4 bg-muted/30 rounded-lg">
+            <span class="text-3xl font-bold text-foreground"><%= @product.stock.presence || 0 %></span>
+            <span class="text-lg text-muted-foreground ml-1"><%= @product.unit %></span>
+            <p class="text-sm text-muted-foreground mt-1">en stock</p>
+          </div>
         </div>
-      </div>
+      <% end %>
 
       <% if policy(@product).destroy? %>
         <div class="card">
