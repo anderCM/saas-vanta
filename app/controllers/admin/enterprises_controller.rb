@@ -1,6 +1,7 @@
 class Admin::EnterprisesController < Admin::ApplicationController
   def new
     @enterprise = Enterprise.new
+    @enterprise.build_settings
   end
 
   def create
@@ -11,6 +12,7 @@ class Admin::EnterprisesController < Admin::ApplicationController
       redirect_to root_path, notice: "Empresa creada exitosamente."
     else
       @enterprise = Enterprise.new(enterprise_params)
+      @enterprise.build_settings unless @enterprise.settings
 
       flash.now[:alert] = service.errors.join(", ")
       render :new, status: :unprocessable_entity
@@ -20,6 +22,7 @@ class Admin::EnterprisesController < Admin::ApplicationController
   private
 
   def enterprise_params
-    params.require(:enterprise).permit(:tax_id, :enterprise_type, :social_reason, :comercial_name, :address, :email, :phone_number, :logo)
+    params.require(:enterprise).permit(:tax_id, :enterprise_type, :social_reason, :comercial_name, :address, :email, :phone_number, :logo,
+                                       settings_attributes: [ :dropshipping_enabled ])
   end
 end

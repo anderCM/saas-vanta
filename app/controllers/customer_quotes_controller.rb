@@ -1,4 +1,6 @@
 class CustomerQuotesController < ApplicationController
+  include PdfExportable
+
   before_action :require_enterprise_selected
   before_action :set_customer_quote, only: %i[show edit update destroy accept reject expire pdf]
 
@@ -17,7 +19,7 @@ class CustomerQuotesController < ApplicationController
   def new
     authorize CustomerQuote
     @customer_quote = current_enterprise.customer_quotes.build(
-      code: generate_next_code,
+      code: CustomerQuote.generate_next_code(current_enterprise),
       issue_date: Date.current,
       expiration_date: 15.days.from_now.to_date,
       created_by: Current.user,
@@ -149,18 +151,7 @@ class CustomerQuotesController < ApplicationController
   def pdf
     authorize @customer_quote, :show?
 
-    html = render_to_string(template: "customer_quotes/pdf", layout: "layouts/pdf")
-
-    pdf_data = WickedPdf.new.pdf_from_string(html,
-      page_size: "A4",
-      margin: { top: 10, bottom: 10, left: 10, right: 10 },
-      print_media_type: true
-    )
-
-    send_data pdf_data,
-      filename: "#{@customer_quote.enterprise.comercial_name.parameterize}-#{@customer_quote.code}.pdf",
-      type: "application/pdf",
-      disposition: "attachment"
+    generate_pdf(@customer_quote, template: "customer_quotes/pdf")
   end
 
   private
@@ -173,16 +164,6 @@ class CustomerQuotesController < ApplicationController
 
   def set_customer_quote
     @customer_quote = current_enterprise.customer_quotes.find(params[:id])
-  end
-
-  def generate_next_code
-    current_year = Date.current.year
-    last_quote = current_enterprise.customer_quotes
-      .where("code LIKE ?", "COT-%-#{current_year}")
-      .order(created_at: :desc)
-      .first
-    last_number = last_quote&.code&.split("-")&.second.to_i || 0
-    "COT-#{(last_number + 1).to_s.rjust(4, '0')}-#{current_year}"
   end
 
   def customer_quote_params

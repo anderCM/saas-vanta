@@ -19,6 +19,7 @@ class EnterprisesController < ApplicationController
   def edit
     @enterprise = current_enterprise
     authorize @enterprise
+    @enterprise.build_settings unless @enterprise.settings
   end
 
   def update
@@ -35,6 +36,9 @@ class EnterprisesController < ApplicationController
   private
 
   def enterprise_params
-    params.require(:enterprise).permit(:comercial_name, :social_reason, :address, :email, :phone_number, :logo)
+    params.require(:enterprise).permit(
+      :comercial_name, :social_reason, :address, :email, :phone_number, :logo,
+      settings_attributes: [ :id, :dropshipping_enabled ]
+    )
   end
 end

@@ -3,6 +3,7 @@ class Customer < ApplicationRecord
   belongs_to :enterprise
   belongs_to :ubigeo, optional: true
   has_many :customer_quotes, dependent: :restrict_with_error
+  has_many :sales, dependent: :restrict_with_error
 
   # Validations
   validates :name, presence: true

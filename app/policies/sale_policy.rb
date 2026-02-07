@@ -1,0 +1,33 @@
+class SalePolicy < ApplicationPolicy
+  def index?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def show?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def create?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def update?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def destroy?
+    platform_super_admin? || enterprise_super_admin?
+  end
+
+  def confirm?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def cancel?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+
+  def generate_purchase_orders?
+    platform_super_admin? || belongs_to_enterprise?
+  end
+end

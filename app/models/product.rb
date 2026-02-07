@@ -4,6 +4,7 @@ class Product < ApplicationRecord
   belongs_to :provider, optional: true
   has_many :purchase_order_items, dependent: :restrict_with_error
   has_many :customer_quote_items, dependent: :restrict_with_error
+  has_many :sale_items, dependent: :restrict_with_error
 
   # Normalizations
   normalizes :sku, with: ->(value) { value.strip.presence }

@@ -1,30 +1,32 @@
 <tr class="item-row" data-customer-quote-form-target="itemRow">
   <td class="px-4 py-3">
     <span class="product-name text-sm font-medium text-foreground"><%= item.product.combobox_display %></span>
-    <%= f.hidden_field "items_attributes[#{index}][id]", value: item.id if item.persisted? %>
-    <%= f.hidden_field "items_attributes[#{index}][product_id]", value: item.product_id, class: "product-id-input" %>
+    <% if item.persisted? %>
+      <%= hidden_field_tag "customer_quote[items_attributes][#{index}][id]", item.id %>
+    <% end %>
+    <%= hidden_field_tag "customer_quote[items_attributes][#{index}][product_id]", item.product_id, class: "product-id-input" %>
   </td>
   <td class="px-4 py-3">
-    <%= f.number_field "items_attributes[#{index}][quantity]",
-                       value: item.quantity,
-                       class: "form-input w-full quantity-input",
-                       min: 1,
-                       data: { action: "input->customer-quote-form#calculateRowTotal" } %>
+    <%= number_field_tag "customer_quote[items_attributes][#{index}][quantity]",
+                         item.quantity,
+                         class: "form-input w-full quantity-input",
+                         min: 1,
+                         data: { action: "input->customer-quote-form#calculateRowTotal" } %>
   </td>
   <td class="px-4 py-3">
-    <%= f.number_field "items_attributes[#{index}][unit_price]",
-                       value: item.unit_price,
-                       class: "form-input w-full unit-price-input",
-                       step: "0.01",
-                       min: 0,
-                       data: { action: "input->customer-quote-form#calculateRowTotal" } %>
+    <%= number_field_tag "customer_quote[items_attributes][#{index}][unit_price]",
+                         item.unit_price,
+                         class: "form-input w-full unit-price-input",
+                         step: "0.01",
+                         min: 0,
+                         data: { action: "input->customer-quote-form#calculateRowTotal" } %>
   </td>
   <td class="px-4 py-3">
     <span class="row-total text-sm font-medium text-foreground">S/ <%= number_with_precision(item.total || 0, precision: 2) %></span>
   </td>
   <td class="px-4 py-3">
     <% if item.persisted? %>
-      <%= f.hidden_field "items_attributes[#{index}][_destroy]", value: "0", class: "destroy-input" %>
+      <%= hidden_field_tag "customer_quote[items_attributes][#{index}][_destroy]", "0", class: "destroy-input" %>
     <% end %>
     <button type="button"
             class="text-destructive hover:text-destructive/80"

@@ -67,6 +67,27 @@
     </div>
   </div>
 
+  <% if @purchase_order.sourceable.is_a?(Sale) %>
+    <div class="card mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-sm font-medium text-muted-foreground mb-2">Origen</h3>
+          <p class="text-foreground">
+            Generada desde venta
+            <%= link_to @purchase_order.sourceable.code, sale_path(@purchase_order.sourceable), class: "text-primary hover:underline font-medium" %>
+          </p>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-muted-foreground mb-2">Cliente (Entrega)</h3>
+          <p class="text-foreground font-medium"><%= @purchase_order.sourceable.customer.name %></p>
+          <% if @purchase_order.delivery_address.present? %>
+            <p class="text-sm text-muted-foreground"><%= @purchase_order.delivery_address %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <div class="card mb-8">
     <h3 class="text-lg font-medium text-foreground mb-4">Items</h3>
 

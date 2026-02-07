@@ -46,6 +46,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :sales do
+    member do
+      patch :confirm
+      patch :cancel
+      post :generate_purchase_orders
+      get :pdf
+    end
+  end
+
   resources :purchase_orders do
     collection do
       get :prefill

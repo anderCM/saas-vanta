@@ -34,14 +34,18 @@
     <td>
       <div class="info-card">
         <div class="info-card-title">Detalles</div>
-        <% if @purchase_order.customer.present? %>
-          <div class="info-row"><span class="label">Cliente</span><span class="value"><%= @purchase_order.customer.name %></span></div>
-        <% end %>
         <% if @purchase_order.expected_date.present? %>
           <div class="info-row"><span class="label">Entrega esperada</span><span class="value"><%= l(@purchase_order.expected_date, format: :long) %></span></div>
         <% end %>
         <% if @purchase_order.destination.present? %>
           <div class="info-row"><span class="label">Destino</span><span class="value"><%= @purchase_order.destination.full_path %></span></div>
+        <% end %>
+        <% if @purchase_order.sourceable.is_a?(Sale) %>
+          <div class="info-row"><span class="label">Venta</span><span class="value"><%= @purchase_order.sourceable.code %></span></div>
+          <div class="info-row"><span class="label">Cliente</span><span class="value"><%= @purchase_order.sourceable.customer.name %></span></div>
+          <% if @purchase_order.delivery_address.present? %>
+            <div class="info-row"><span class="label">Dir. Entrega</span><span class="value"><%= @purchase_order.delivery_address %></span></div>
+          <% end %>
         <% end %>
       </div>
     </td>

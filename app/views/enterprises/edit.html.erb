@@ -62,6 +62,8 @@
       </div>
     </div>
 
+    <%= render "enterprises/settings_fields", f: f %>
+
     <div class="flex justify-end gap-3">
       <%= link_to "Cancelar", root_path, class: "btn-secondary" %>
       <%= f.submit "Guardar Cambios", class: "btn-primary cursor-pointer" %>
