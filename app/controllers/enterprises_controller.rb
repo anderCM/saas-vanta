@@ -37,7 +37,7 @@ class EnterprisesController < ApplicationController
 
   def enterprise_params
     params.require(:enterprise).permit(
-      :comercial_name, :social_reason, :address, :email, :phone_number, :logo, :ubigeo_id,
+      :comercial_name, :tax_id, :social_reason, :address, :email, :phone_number, :logo, :ubigeo_id,
       settings_attributes: [ :id, :use_stock, :dropshipping_enabled ]
     )
   end
