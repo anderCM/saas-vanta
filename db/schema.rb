@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,6 +74,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.index ["enterprise_id"], name: "index_carriers_on_enterprise_id"
   end
 
+  create_table "credit_note_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "credit_note_id", null: false
+    t.string "description", null: false
+    t.string "item_type", default: "product"
+    t.decimal "quantity", precision: 12, scale: 2, null: false
+    t.string "tax_type", default: "gravado"
+    t.decimal "total", precision: 12, scale: 2, default: "0.0"
+    t.decimal "unit_price", precision: 12, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
+  end
+
+  create_table "credit_notes", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.text "description", null: false
+    t.bigint "enterprise_id", null: false
+    t.string "reason_code", null: false
+    t.bigint "sale_id", null: false
+    t.string "status", default: "pending", null: false
+    t.decimal "subtotal", precision: 12, scale: 2, default: "0.0"
+    t.string "sunat_cdr_code"
+    t.text "sunat_cdr_description"
+    t.string "sunat_document_type", default: "07"
+    t.string "sunat_hash"
+    t.integer "sunat_number"
+    t.text "sunat_qr_image"
+    t.jsonb "sunat_response_data"
+    t.string "sunat_series"
+    t.string "sunat_status"
+    t.string "sunat_uuid"
+    t.text "sunat_xml"
+    t.decimal "tax", precision: 12, scale: 2, default: "0.0"
+    t.decimal "total", precision: 12, scale: 2, default: "0.0"
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_credit_notes_on_created_by_id"
+    t.index ["enterprise_id", "code"], name: "index_credit_notes_on_enterprise_id_and_code", unique: true
+    t.index ["enterprise_id"], name: "index_credit_notes_on_enterprise_id"
+    t.index ["sale_id"], name: "index_credit_notes_on_sale_id"
+  end
+
+  create_table "customer_quote_installments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.bigint "customer_quote_id", null: false
+    t.date "due_date", null: false
+    t.integer "installment_number", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_quote_id", "installment_number"], name: "idx_cq_installments_on_quote_and_number", unique: true
+    t.index ["customer_quote_id"], name: "index_customer_quote_installments_on_customer_quote_id"
+  end
+
   create_table "customer_quote_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "customer_quote_id", null: false
@@ -97,8 +151,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.date "expiration_date"
     t.date "issue_date", null: false
     t.text "notes"
+    t.string "payment_condition", default: "cash", null: false
     t.bigint "seller_id", null: false
-    t.string "status", default: "draft", null: false
+    t.string "status", default: "pending", null: false
     t.decimal "subtotal", precision: 10, scale: 2, default: "0.0"
     t.decimal "tax", precision: 10, scale: 2, default: "0.0"
     t.decimal "total", precision: 10, scale: 2, default: "0.0"
@@ -109,6 +164,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.index ["enterprise_id", "code"], name: "index_customer_quotes_on_enterprise_id_and_code", unique: true
     t.index ["enterprise_id"], name: "index_customer_quotes_on_enterprise_id"
     t.index ["issue_date"], name: "index_customer_quotes_on_issue_date"
+    t.index ["payment_condition"], name: "index_customer_quotes_on_payment_condition"
     t.index ["seller_id"], name: "index_customer_quotes_on_seller_id"
     t.index ["status"], name: "index_customer_quotes_on_status"
   end
@@ -230,10 +286,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.string "sunat_next_grr_series"
     t.integer "sunat_next_grt_number"
     t.string "sunat_next_grt_series"
+    t.integer "sunat_next_nota_credito_boleta_number"
+    t.integer "sunat_next_nota_credito_factura_number"
     t.string "sunat_series_boleta", default: "B001"
     t.string "sunat_series_factura", default: "F001"
     t.string "sunat_series_grr", default: "T001"
     t.string "sunat_series_grt", default: "V001"
+    t.string "sunat_series_nota_credito_boleta"
+    t.string "sunat_series_nota_credito_factura"
     t.string "sunat_sol_password"
     t.string "sunat_sol_user"
     t.datetime "updated_at", null: false
@@ -366,6 +426,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.index ["slug"], name: "index_roles_on_slug", unique: true
   end
 
+  create_table "sale_installments", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.date "due_date", null: false
+    t.integer "installment_number", null: false
+    t.date "paid_at"
+    t.bigint "sale_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sale_id", "installment_number"], name: "index_sale_installments_on_sale_id_and_installment_number", unique: true
+    t.index ["sale_id"], name: "index_sale_installments_on_sale_id"
+  end
+
   create_table "sale_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "product_id", null: false
@@ -388,6 +461,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.bigint "enterprise_id", null: false
     t.date "issue_date", null: false
     t.text "notes"
+    t.string "payment_condition", default: "cash", null: false
     t.bigint "seller_id", null: false
     t.bigint "sourceable_id"
     t.string "sourceable_type"
@@ -413,6 +487,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
     t.index ["enterprise_id", "code"], name: "index_sales_on_enterprise_id_and_code", unique: true
     t.index ["enterprise_id"], name: "index_sales_on_enterprise_id"
     t.index ["issue_date"], name: "index_sales_on_issue_date"
+    t.index ["payment_condition"], name: "index_sales_on_payment_condition"
     t.index ["seller_id"], name: "index_sales_on_seller_id"
     t.index ["sourceable_type", "sourceable_id"], name: "index_sales_on_sourceable"
     t.index ["status"], name: "index_sales_on_status"
@@ -524,6 +599,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
   add_foreign_key "bulk_imports", "enterprises"
   add_foreign_key "bulk_imports", "users"
   add_foreign_key "carriers", "enterprises"
+  add_foreign_key "credit_note_items", "credit_notes"
+  add_foreign_key "credit_notes", "enterprises"
+  add_foreign_key "credit_notes", "sales"
+  add_foreign_key "credit_notes", "users", column: "created_by_id"
+  add_foreign_key "customer_quote_installments", "customer_quotes"
   add_foreign_key "customer_quote_items", "customer_quotes"
   add_foreign_key "customer_quote_items", "products"
   add_foreign_key "customer_quotes", "customers"
@@ -557,6 +637,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
   add_foreign_key "purchase_orders", "providers"
   add_foreign_key "purchase_orders", "ubigeos", column: "destination_id"
   add_foreign_key "purchase_orders", "users", column: "created_by_id"
+  add_foreign_key "sale_installments", "sales"
   add_foreign_key "sale_items", "products"
   add_foreign_key "sale_items", "sales"
   add_foreign_key "sales", "customers"

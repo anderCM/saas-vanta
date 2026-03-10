@@ -11,6 +11,8 @@ module Sunat
       validate_prerequisites!
       return unless valid?
 
+      clear_previous_document! if re_emission?
+
       settings = @sale.enterprise.settings
       client = ApiClient.new(api_key: settings.sunat_api_key)
 
@@ -64,6 +66,26 @@ module Sunat
       @sale.sunat_uuid.present? && @sale.sunat_status.in?(%w[ERROR REJECTED])
     end
 
+    def re_emission?
+      @sale.sunat_uuid.present? && @sale.has_accepted_credit_note?
+    end
+
+    def clear_previous_document!
+      @sale.update!(
+        sunat_uuid: nil,
+        sunat_status: nil,
+        sunat_document_type: nil,
+        sunat_series: nil,
+        sunat_number: nil,
+        sunat_xml: nil,
+        sunat_cdr_code: nil,
+        sunat_cdr_description: nil,
+        sunat_hash: nil,
+        sunat_qr_image: nil,
+        sunat_response_data: nil
+      )
+    end
+
     def validate_prerequisites!
       unless @sale.confirmed?
         add_error("La venta debe estar confirmada para emitir comprobante")
@@ -71,7 +93,7 @@ module Sunat
         return
       end
 
-      if @sale.sunat_uuid.present? && !retry_emission?
+      if @sale.sunat_uuid.present? && !retry_emission? && !re_emission?
         add_error("Esta venta ya tiene un comprobante emitido")
         set_as_invalid!
         return

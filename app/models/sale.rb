@@ -6,11 +6,20 @@ class Sale < ApplicationRecord
   belongs_to :sourceable, polymorphic: true, optional: true
 
   has_many :items, class_name: "SaleItem", dependent: :destroy
+  has_many :installments, class_name: "SaleInstallment", dependent: :destroy
   has_many :purchase_orders, as: :sourceable
   has_many :dispatch_guides, as: :sourceable
+  has_many :credit_notes, dependent: :destroy
   accepts_nested_attributes_for :items, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :installments, allow_destroy: true, reject_if: :all_blank
 
   enum :status, { pending: "pending", confirmed: "confirmed", cancelled: "cancelled" }
+  enum :payment_condition, { cash: "cash", credit: "credit" }
+
+  validates :payment_condition, presence: true
+  validate :validate_installments_for_credit
+  validate :validate_no_installments_for_cash
+  validate :validate_credit_limit, if: -> { credit? && customer.present? }
 
   def self.generate_next_code(enterprise)
     current_year = Date.current.year
@@ -39,11 +48,28 @@ class Sale < ApplicationRecord
   end
 
   def can_emit_document?
-    confirmed? && sunat_uuid.blank? && enterprise.settings&.sunat_api_key.present? && enterprise.settings&.sunat_certificate_uploaded?
+    confirmed? &&
+      (sunat_uuid.blank? || has_accepted_credit_note?) &&
+      enterprise.settings&.sunat_api_key.present? &&
+      enterprise.settings&.sunat_certificate_uploaded?
   end
 
   def can_retry_document?
     sunat_uuid.present? && sunat_status.in?(%w[ERROR REJECTED])
+  end
+
+  def can_emit_credit_note?
+    sunat_uuid.present? && sunat_status == "ACCEPTED" && !credit_notes.exists?(sunat_status: "ACCEPTED")
+  end
+
+  def has_accepted_credit_note?
+    credit_notes.exists?(sunat_status: "ACCEPTED")
+  end
+
+  def can_create_dispatch_guide?
+    confirmed? && has_goods? && !dispatch_guides.exists? &&
+      enterprise.settings&.sunat_api_key.present? &&
+      enterprise.settings&.sunat_certificate_uploaded?
   end
 
   def sunat_status_badge_class
@@ -148,6 +174,40 @@ class Sale < ApplicationRecord
   end
 
   private
+
+  def validate_installments_for_credit
+    return unless credit?
+
+    cuotas = installments.reject(&:marked_for_destruction?)
+    if cuotas.empty?
+      errors.add(:base, "Las ventas a crédito requieren al menos una cuota")
+    elsif total.present? && total.positive? && cuotas.sum(&:amount) != total
+      errors.add(:base, "Las cuotas deben sumar el total del documento (S/ #{total})")
+    end
+  end
+
+  def validate_no_installments_for_cash
+    return unless cash?
+
+    if installments.reject(&:marked_for_destruction?).any?
+      errors.add(:base, "No se permiten cuotas en ventas al contado")
+    end
+  end
+
+  def validate_credit_limit
+    return unless customer.credit_limit.positive?
+
+    available = customer.available_credit
+    # Si estamos editando, sumar las cuotas anteriores de esta venta
+    if persisted?
+      own_pending = installments.where(status: "pending").sum(:amount)
+      available += own_pending
+    end
+
+    if total.present? && total > available
+      errors.add(:base, "El monto excede el crédito disponible del cliente (S/ #{available.round(2)})")
+    end
+  end
 
   def update_product_stock!
     items.includes(:product).find_each do |item|
