@@ -206,6 +206,7 @@ module Sunat
         reason_code: credit_note.reason_code,
         description: credit_note.description,
         items: credit_note.items.map do |item|
+          tax_type = item.tax_type || "gravado"
           {
             description: item.description,
             quantity: item.quantity.to_f,
