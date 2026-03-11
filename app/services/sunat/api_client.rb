@@ -179,6 +179,7 @@ module Sunat
             quantity: item.quantity.to_f,
             item_type: "product",
             unit_price: item.unit_price.to_f,
+            unit_price_without_tax: item.unit_price.to_f / (1 + PeruTax::IGV_RATE),
             tax_type: "gravado"
           }
         end
@@ -210,7 +211,8 @@ module Sunat
             quantity: item.quantity.to_f,
             item_type: item.item_type || "product",
             unit_price: item.unit_price.to_f,
-            tax_type: item.tax_type || "gravado"
+            unit_price_without_tax: tax_type == "gravado" ? item.unit_price.to_f / (1 + PeruTax::IGV_RATE) : item.unit_price.to_f,
+            tax_type: tax_type
           }
         end
       }
